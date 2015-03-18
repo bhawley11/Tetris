@@ -8,6 +8,7 @@
 
 var TETRIS = {
     images : {},
+    screens : {},
     status : {
         preloadRequest : 0,
         preloadComplete : 0
@@ -36,6 +37,10 @@ window.addEventListener('load', function() {
                 'preload!images/warthog/warthog_angle_low.png',
                 'preload!images/warthog/warthog_angle_medium.png',
                 'preload!images/warthog/warthog_angle_small.png',
+
+                'preload!images/backgrounds/delta_halo.jpg',
+
+                'preload!images/title.png',
 
                 /* SCRIPTS */
                 'preload!scripts/render.js',

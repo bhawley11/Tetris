@@ -8,6 +8,19 @@
     <link rel="stylesheet" type="text/css" href="style/style.css">
 </head>
 <body>
-    <canvas id="canvas" width="1000" height="800"></canvas>
+    <div id="main">
+        <div id="menu-screen" class="screen">
+            <img id="menu-title-image" src="images/title.png" alt="Halo Tetris">
+            <ol id="menu-list">
+                <li><button>New Game</button></li>
+                <li><button>High Scores</button></li>
+                <li><button>Controls</button></li>
+                <li><button>Credits</button></li>
+            </ol>
+        </div>
+        <div id="game-screen" class="screen">
+            <canvas id="canvas" width="1000" height="800"></canvas>
+        </div>
+    </div>
 </body>
 </html>
