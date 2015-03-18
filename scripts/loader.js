@@ -19,6 +19,9 @@ window.addEventListener('load', function() {
     Modernizr.load([
         {
             load : [
+                /* SOUNDS */
+
+
                 /* IMAGES */
                 'preload!images/fire/warthog_fire_1.png',
                 'preload!images/fire/warthog_fire_2.png',
