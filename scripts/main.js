@@ -10,6 +10,6 @@ TETRIS.initialize = (function() {
 
     return function() {
         console.log('Game Initializing...');
-
+        document.getElementById('game-screen').style.display = 'none';
     };
 }());
