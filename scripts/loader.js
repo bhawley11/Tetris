@@ -22,6 +22,7 @@ window.addEventListener('load', function() {
             load : [
                 /* SOUNDS */
                 /* sound are causing an unhandled exception ILLEGAL TOKEN */
+                'preload!sounds/voice/victory.mp3',
 
                 /* IMAGES */
                 'preload!images/fire/warthog_fire_1.png',
@@ -46,6 +47,7 @@ window.addEventListener('load', function() {
                 'preload!scripts/render.js',
                 'preload!scripts/persistence.js',
                 'preload!scripts/input.js',
+                'preload!scripts/menu.js',
                 'preload!scripts/main.js'
             ],
             complete : function() {
@@ -72,7 +74,7 @@ yepnope.addPrefix('preload', function(resource) {
 
         if(TETRIS.status.preloadComplete === TETRIS.status.preloadRequest) {
             console.log('Preloading complete!');
-            TETRIS.initialize();
+            TETRIS.main.init();
         }
     };
 
