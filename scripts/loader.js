@@ -20,7 +20,7 @@ window.addEventListener('load', function() {
         {
             load : [
                 /* SOUNDS */
-
+                /* sound are causing an unhandled exception ILLEGAL TOKEN */
 
                 /* IMAGES */
                 'preload!images/fire/warthog_fire_1.png',
