@@ -41,6 +41,7 @@ window.addEventListener('load', function() {
                 'preload!images/warthog/warthog_angle_small.png',
 
                 'preload!images/backgrounds/delta_halo.jpg',
+                'preload!images/backgrounds/fud.jpg',
 
                 'preload!images/title.png',
 
