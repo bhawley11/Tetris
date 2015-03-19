@@ -47,6 +47,10 @@ window.addEventListener('load', function() {
                 'preload!scripts/render.js',
                 'preload!scripts/persistence.js',
                 'preload!scripts/input.js',
+                'preload!scripts/controls.js',
+                'preload!scripts/credits.js',
+                'preload!scripts/game.js',
+                'preload!scripts/highScores.js',
                 'preload!scripts/menu.js',
                 'preload!scripts/main.js'
             ],

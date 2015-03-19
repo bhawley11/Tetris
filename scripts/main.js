@@ -14,13 +14,24 @@ TETRIS.main = (function() {
             screens[screen].classList.remove('active');
         }
 
+        console.log(TETRIS.screens);
+        console.log(screenName);
+        console.log(TETRIS.screens[screenName]);
         TETRIS.screens[screenName].run();
         document.getElementById(screenName).classList.add('active');
     }
 
     function init() {
+        var screen = null;
+
         console.log('Game Initializing...');
-        document.getElementById('game').style.display = 'none';
+
+        for (screen in TETRIS.screens) {
+            if (TETRIS.screens.hasOwnProperty(screen)) {
+                TETRIS.screens[screen].init();
+            }
+        }
+
         showScreen('menu');
     }
 
