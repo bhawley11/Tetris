@@ -23,7 +23,14 @@ TETRIS.screens['menu'] = (function() {
         }, false);
     }
 
-    function run() { }
+    function run() {
+        TETRIS.menuMusic = new Audio('/Tetris/sounds/music/title_theme.mp3');
+        TETRIS.menuMusic.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+        TETRIS.menuMusic.play();
+    }
 
     return {
         init : init,

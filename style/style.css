@@ -79,8 +79,9 @@ ul {
 
 /* ID'S */
 #canvas {
-    border: 4px solid #a42bee;
-    border-radius: 10px;
+    /*border: 4px solid #a42bee;
+    border-radius: 10px;*/
+
 }
 
 #menu-list {
