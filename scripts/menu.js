@@ -2,24 +2,24 @@
  * Created by Brenton on 3/18/2015.
  */
 
-TETRIS.screens['menu'] = (function(main) {
+TETRIS.screens['menu'] = (function() {
     'use strict';
 
     function init() {
         document.getElementById('menu-button-newGame').addEventListener('click', function () {
-            main.showScreen('game');
+            TETRIS.main.showScreen('game');
         }, false);
 
         document.getElementById('menu-button-highScores').addEventListener('click', function () {
-            main.showScreen('highScores');
+            TETRIS.main.showScreen('highScores');
         }, false);
 
         document.getElementById('menu-button-controls').addEventListener('click', function () {
-          main.showScreen('controls');
+          TETRIS.main.showScreen('controls');
         }, false);
 
         document.getElementById('menu-button-credits').addEventListener('click', function () {
-            main.showScreen('credits');
+            TETRIS.main.showScreen('credits');
         }, false);
     }
 
@@ -29,4 +29,4 @@ TETRIS.screens['menu'] = (function(main) {
         init : init,
         run : run
     };
-}(TETRIS.main));
+}());

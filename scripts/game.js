@@ -2,7 +2,7 @@
  * Created by Brenton on 3/18/2015.
  */
 
-TETRIS.screens['game'] = (function(main) {
+TETRIS.screens['game'] = (function() {
     'use strict';
 
     function init() {
@@ -17,4 +17,4 @@ TETRIS.screens['game'] = (function(main) {
         init : init,
         run : run
     };
-}(TETRIS.main));
+}());

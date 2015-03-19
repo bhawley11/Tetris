@@ -11,15 +11,33 @@
     <div id="main">
         <div id="menu" class="screen">
             <img id="menu-title-image" src="images/title.png" alt="Halo Tetris">
-            <ol id="menu-list">
+            <ul id="menu-list">
                 <li><button id="menu-button-newGame">New Game</button></li>
                 <li><button id="menu-button-highScores">High Scores</button></li>
                 <li><button id="menu-button-controls">Controls</button></li>
                 <li><button id="menu-button-credits">Credits</button></li>
-            </ol>
+            </ul>
         </div>
         <div id="game" class="screen">
             <canvas id="canvas" width="1000" height="800"></canvas>
+        </div>
+        <div id="highScores" class="screen">
+            <ol id="highScores-list">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ol>
+            <button id="highScores-back" class="back-button">Back</button>
+        </div>
+        <div id="controls" class="screen">
+            <h1>CONTROLS</h1>
+            <button id="controls-back" class="back-button">Back</button>
+        </div>
+        <div id="credits" class="screen">
+            <h1>CREDITS</h1>
+            <button id="credits-back" class="back-button">Back</button>
         </div>
     </div>
 </body>
