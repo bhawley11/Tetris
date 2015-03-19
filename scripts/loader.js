@@ -22,6 +22,7 @@ window.addEventListener('load', function() {
             load : [
                 /* SOUNDS */
                 /* sound are causing an unhandled exception ILLEGAL TOKEN */
+                'preload!sounds/music/title_theme.mp3',
                 'preload!sounds/voice/victory.mp3',
 
                 /* IMAGES */

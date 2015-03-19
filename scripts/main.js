@@ -14,9 +14,6 @@ TETRIS.main = (function() {
             screens[screen].classList.remove('active');
         }
 
-        console.log(TETRIS.screens);
-        console.log(screenName);
-        console.log(TETRIS.screens[screenName]);
         TETRIS.screens[screenName].run();
         document.getElementById(screenName).classList.add('active');
     }
