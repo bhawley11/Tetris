@@ -22,7 +22,6 @@ button {
     border-color: transparent;
     border-radius: 10px;
     margin-top: 25px;
-    /*font-family: 'Josefin Slab', serif;*/
     font-family : "Arial Black", Gadget, sans-serif;
 }
 
@@ -51,13 +50,8 @@ ul {
 .back-button {
     display: block;
     text-align: center;
-    margin-left: auto;
-    margin-right: auto;
     padding-left: 0;
     padding-right: 0;
-
-    position: relative;
-    top: 550px;
 }
 
 .control-change-key-box {
@@ -139,12 +133,14 @@ ul {
     margin-right: auto;
     padding-left: 0;
     padding-right: 0;
-    padding-top: 50px;
+    padding-top: 100px;
 }
 
 #control-title{
     text-align: center;
     color: #35CAFF;
+    padding-top: 43px;
+    margin-bottom: 5px;
 }
 
 #controls-label-list {
@@ -158,9 +154,26 @@ ul {
     margin-top: 49px;
 }
 
-#controls li{
+#controls-back {
+    position: relative;
+    top: 500px;
+    left: 89px;
 }
 
-#controls textarea{
+#controls-bind-text {
+    color: #a6f1ff;
+    text-align: center;
+    visibility: hidden;
+}
 
+#highScores-back {
+    position: relative;
+    top: 500px;
+    left: 385px;
+}
+
+#credits-back {
+    position: relative;
+    top: 500px;
+    left: 385px;
 }
