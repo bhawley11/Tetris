@@ -34,14 +34,26 @@
         </div>
         <div id="controls" class="screen">
             <h1 id="control-title">CONTROLS</h1>
-            <ul id="control-list">
-                <li>Move Left  <textarea id="left-control" readonly></textarea></li><br/>
-                <li>Move Right <textarea id="right-control" readonly></textarea></li><br/>
-                <li>Rotate Left <textarea id="left-rotate-control" readonly></textarea></li><br/>
-                <li>Rotate Right <textarea id="right-rotate-control" readonly></textarea></li><br/>
-                <li>Soft Drop <textarea id="soft-drop-control" readonly></textarea></li><br/>
-                <li>Hard Drop <textarea id="hard-drop-control" readonly></textarea></li>
-            </ul>
+            <div class="float-left">
+                <ul id="controls-label-list">
+                    <li class="controls-label">Move Left</li><br/>
+                    <li class="controls-label">Move Right</li><br/>
+                    <li class="controls-label">Rotate Left</li><br/>
+                    <li class="controls-label">Rotate Right</li><br/>
+                    <li class="controls-label">Soft Drop</li><br/>
+                    <li class="controls-label">Hard Drop</li>
+                </ul>
+            </div>
+            <div class="float-right">
+                <ul id="controls-box-list">
+                    <li class="controls-box"><textarea id="left-control" class="control-change-key-box" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="right-control" class="control-change-key-box" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="left-rotate-control" class="control-change-key-box" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="right-rotate-control" class="control-change-key-box" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="soft-drop-control" class="control-change-key-box" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="hard-drop-control" class="control-change-key-box" readonly></textarea></li>
+                </ul>
+            </div>
             <button id="controls-back" class="back-button">Back</button>
         </div>
         <div id="credits" class="screen">
