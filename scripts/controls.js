@@ -15,12 +15,12 @@ TETRIS.screens['controls'] = (function() {
             TETRIS.main.showScreen('menu');
         }, false);
         setKeys();
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_A, function() {TETRIS.game.moveLeft();});
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_D, function() {TETRIS.game.moveRight();});
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_S, function() {TETRIS.game.softDrop();});
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_X, function() {TETRIS.game.hardDrop();});
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_E, function() {TETRIS.game.rotateRight();});
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_Q, function() {TETRIS.game.rotateLeft();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_A, function() {TETRIS.screens['game'].moveLeft();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_D, function() {TETRIS.screens['game'].moveRight();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_S, function() {TETRIS.screens['game'].softDrop();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_X, function() {TETRIS.screens['game'].hardDrop();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_E, function() {TETRIS.screens['game'].rotateRight();});
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_Q, function() {TETRIS.screens['game'].rotateLeft();});
     }
 
     function getKeyCode(e) {
@@ -64,42 +64,42 @@ TETRIS.screens['controls'] = (function() {
         if(id === 'left-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[0].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.game.moveLeft();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].moveLeft();});
             arrayID[0].value = newKeyCode;
             arrayID[0].key = newKeyChar;
         }
         else if(id === 'right-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[1].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.game.moveRight();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].moveRight();});
             arrayID[1].value = newKeyCode;
             arrayID[1].key = newKeyChar;
         }
         else if(id === 'soft-drop-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[4].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.game.softDrop();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].softDrop();});
             arrayID[4].value = newKeyCode;
             arrayID[4].key = newKeyChar;
         }
         else if(id === 'hard-drop-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[5]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.game.softDrop();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].hardDrop();});
             arrayID[5].value = newKeyCode;
             arrayID[5].key = newKeyChar;
         }
         else if(id === 'left-rotate-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[2]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function(){TETRIS.game.softDrop();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function(){TETRIS.screens['game'].rotateLeft();});
             arrayID[2].value = newKeyCode;
             arrayID[2].key = newKeyChar;
         }
         else if(id === 'right-rotate-control')
         {
             TETRIS.keyboard.unregisterCommand(arrayID[3]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.game.softDrop();});
+            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].rotateRight();});
             arrayID[3].value = newKeyCode;
             arrayID[3].key = newKeyChar;
         }
