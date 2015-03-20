@@ -26,21 +26,23 @@ TETRIS.screens['controls'] = (function() {
     function getKeyCode(e) {
         var i = 0,
             duplicate = false;
-        newKeyCode = e.keyCode;
-        console.log("The Key Code is: " + newKeyCode);
-        if(newKeyCode < 48 || newKeyCode > 90) {
-            newKeyChar = getSymbols(newKeyCode).toUpperCase();
-        }
-        else {
-            newKeyChar = String.fromCharCode(e.which).toUpperCase();
-        }
-        for(i; i < arrayID.length; i++) {
-            if(arrayID[i].value === newKeyCode) {
-                duplicate = true;
+        if(e.keyCode != 27){
+            newKeyCode = e.keyCode;
+            console.log("The Key Code is: " + newKeyCode);
+            if (newKeyCode < 48 || newKeyCode > 90) {
+                newKeyChar = getSymbols(newKeyCode).toUpperCase();
             }
-        }
-        if(!duplicate){
-            updateControls();
+            else {
+                newKeyChar = String.fromCharCode(e.which).toUpperCase();
+            }
+            for (i; i < arrayID.length; i++) {
+                if (arrayID[i].value === newKeyCode) {
+                    duplicate = true;
+                }
+            }
+            if (!duplicate) {
+                updateControls();
+            }
         }
     }
 
