@@ -1,12 +1,18 @@
-@-webkit-keyframes greenPulse {
+@-webkit-keyframes buttonPulse {
     from { background-color: #35caff; -webkit-box-shadow: 0 0 9px #333; }
     50% { background-color: #1cd2ee; -webkit-box-shadow: 0 0 18px #a6f1ff; }
     to { background-color: #35caff; -webkit-box-shadow: 0 0 9px #333; }
 }
 
+@-webkit-keyframes controlBoxPulse {
+    from { background-color: #0e0d1d; -webkit-box-shadow: 0 0 9px #333; }
+    50% { background-color: #0e0d1d; -webkit-box-shadow: 0 0 18px #a6f1ff; }
+    to { background-color: #0e0d1d; -webkit-box-shadow: 0 0 9px #333; }
+}
+
 /* DEFAULT TAGS */
 button {
-    -webkit-animation-name: greenPulse;
+    -webkit-animation-name: buttonPulse;
     -webkit-animation-duration: 2s;
     -webkit-animation-iteration-count: infinite;
 
@@ -54,6 +60,42 @@ ul {
     top: 550px;
 }
 
+.control-change-key-box {
+    text-align: center;
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    resize : none;
+    border: none;
+    overflow: auto;
+    background-color: #0e0d1d;
+    color: #35CAFF;
+    height: 25px;
+    width: 150px;
+}
+
+.control-change-key-box:focus {
+    -webkit-animation-name: controlBoxPulse;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+.controls-label {
+    margin-top: 35px;
+}
+
+.controls-box {
+    margin-top: 23px;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
 .screen {
     margin-top: 50px;
     padding-left: 0;
@@ -79,11 +121,6 @@ ul {
 }
 
 /* ID'S */
-#canvas {
-    /*border: 4px solid #a42bee;
-    border-radius: 10px;*/
-
-}
 
 #menu-list {
     display: block;
@@ -110,27 +147,20 @@ ul {
     color: #35CAFF;
 }
 
-#control-list {
+#controls-label-list {
     color: #35CAFF;
     margin-left: 200px;
     margin-top: 50px;
 }
 
+#controls-box-list {
+    margin-right: 200px;
+    margin-top: 49px;
+}
+
 #controls li{
-    margin-bottom: 50px;
 }
 
 #controls textarea{
-    text-align: right;
-    margin-left: 20%;
-    font-size: inherit;
-    font-family: inherit;
-    outline: none;
-    resize : none;
-    border: none;
-    overflow: auto;
-    background-color: #0e0d1d;
-    color: #35CAFF;
-    height: 25px;
-    width: 300px;
+
 }
