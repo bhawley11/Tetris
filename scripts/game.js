@@ -5,15 +5,22 @@
 TETRIS.screens['game'] = (function() {
     'use strict';
 
-    var gameBoard = null;
+    var cancelNextRequest = false,
+        gameBoard = null,
+        keyboard = TETRIS.input.Keyboard();
 
     function init() {
         console.log('Tetris initializing...');
 
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
+        keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
+            cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
+
         });
-        gameBoard = TETRIS.graphics.GameBoard();
+
+        gameBoard = TETRIS.graphics.GameBoard({
+            pieceBackgroundImage : 'images/backgrounds/fud.jpg'
+        });
     }
 
     function gameLoop(time) {
@@ -23,7 +30,9 @@ TETRIS.screens['game'] = (function() {
         update();
         render();
 
-        TETRIS.sessionID = requestAnimationFrame(gameLoop);
+        if (!cancelNextRequest) {
+            TETRIS.sessionID = requestAnimationFrame(gameLoop);
+        }
     }
 
     function render() {
@@ -37,11 +46,13 @@ TETRIS.screens['game'] = (function() {
         }
         TETRIS.menuMusic.pause();
         TETRIS.lastTime = performance.now();
+
+        cancelNextRequest = false;
         TETRIS.sessionID = requestAnimationFrame(gameLoop);
     }
 
     function update() {
-
+        keyboard.update(TETRIS.elapsedTime);
     }
 
     function rotateLeft(){
