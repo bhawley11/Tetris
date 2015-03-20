@@ -20,6 +20,7 @@ TETRIS.main = (function() {
 
     function init() {
         var screen = null;
+        TETRIS.keyboard = TETRIS.input.Keyboard();
 
         console.log('Game Initializing...');
 
