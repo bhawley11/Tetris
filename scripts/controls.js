@@ -23,7 +23,8 @@ TETRIS.screens['controls'] = (function() {
 
     function getKeyCode(e) {
         newKeyCode = e.keyCode;
-        newKeyChar = String.fromCharCode(newKeyCode);
+        console.log("The Key Code is: " + newKeyCode);
+        newKeyChar = String.fromCharCode(e.which).toUpperCase();
         updateControls();
     }
 
@@ -83,7 +84,7 @@ TETRIS.screens['controls'] = (function() {
     function addListener(){
         var id = document.activeElement.id,
             node = document.getElementById(id);
-            node.addEventListener('keydown', getKeyCode,false);
+            node.addEventListener('keypress', getKeyCode,false);
     }
 
     function displayUserControls(){

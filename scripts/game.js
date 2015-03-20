@@ -6,13 +6,12 @@ TETRIS.screens['game'] = (function() {
     'use strict';
 
     var cancelNextRequest = false,
-        gameBoard = null,
-        keyboard = TETRIS.input.Keyboard();
+        gameBoard = null;
 
     function init() {
         console.log('Tetris initializing...');
 
-        keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
 
@@ -52,7 +51,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function update() {
-        keyboard.update(TETRIS.elapsedTime);
+        TETRIS.keyboard.update(TETRIS.elapsedTime);
     }
 
     function rotateLeft(){
