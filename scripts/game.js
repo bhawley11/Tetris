@@ -7,7 +7,9 @@ TETRIS.screens['game'] = (function() {
 
     var cancelNextRequest = false,
         gameBoard = null,
-        keyboard = TETRIS.input.Keyboard();
+        keyboard = TETRIS.input.Keyboard(),
+        scoreBoard = null,
+        theHog = null;
 
     function init() {
         console.log('Tetris initializing...');
@@ -20,6 +22,19 @@ TETRIS.screens['game'] = (function() {
 
         gameBoard = TETRIS.graphics.GameBoard({
             pieceBackgroundImage : 'images/backgrounds/fud.jpg'
+        });
+
+        scoreBoard = TETRIS.graphics.StatScreen({
+            level : 1,
+            lines : 0,
+            score : 0,
+            topScore : 0
+        });
+
+        theHog = TETRIS.graphics.Texture({
+                image : TETRIS.images['images/warthog/warthog_angle_flat.png'],
+                center : { x : 700, y : 650 },
+                width : 175, height : 125
         });
     }
 
@@ -36,7 +51,10 @@ TETRIS.screens['game'] = (function() {
     }
 
     function render() {
+        TETRIS.graphics.clear();
         gameBoard.draw();
+        scoreBoard.draw();
+        theHog.draw();
     }
 
     function run() {

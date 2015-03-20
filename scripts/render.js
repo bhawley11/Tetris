@@ -22,6 +22,27 @@ TETRIS.graphics = (function() {
     /*
       Each piece section should be 35px by 35px
     */
+    function Font(spec) {
+        var that = {};
+
+        that.draw = function() {
+            ctx. save();
+            ctx.fillStyle = spec.color;
+            ctx.font = spec.font.style + ' ' + spec.font.size + ' ' + spec.font.type; //bold 14px Tahoma
+            ctx.fillText(
+                spec.text,
+                spec.origin.x,
+                spec.origin.y);
+            ctx.restore();
+        };
+
+        that.setText = function(newText) {
+            spec.text = newText;
+        };
+
+        return that;
+    }
+
     function GameBoard(spec) {
         var that = {},
             playScreen = undefined,
@@ -32,7 +53,7 @@ TETRIS.graphics = (function() {
                 origin : { x : 75, y : 50 },
                 to : { x : 350, y : 700 },
                 innerColor : 'rgba(14, 13, 29, 0.75)',
-                outerColor : 'rgba(166, 241, 255, 0.1)',
+                outerColor : 'rgba(166, 241, 255, 1)',
                 outerWidth : 3
             }).draw();
 
@@ -40,7 +61,7 @@ TETRIS.graphics = (function() {
                 origin : { x : 475, y : 50 },
                 to : { x : 450, y : 300 },
                 innerColor : 'rgba(14, 13, 29, 0.25)',
-                outerColor : 'rgba(166, 241, 255, 0.1)',
+                outerColor : 'rgba(166, 241, 255, 1)',
                 outerWidth : 3,
                 image : spec.pieceBackgroundImage
             }).draw();
@@ -144,6 +165,84 @@ TETRIS.graphics = (function() {
         return that;
     }
 
+    function StatScreen(spec) {
+        var that = {},
+            levelFont = Font({
+                color : '#35caff',
+                font : { style : 'normal', size : '20px', type : 'Josefin Slab' },
+                origin : { x : 515, y : 425 },
+                text : 'LEVEL : ' + spec.level
+            }),
+            linesFont = Font({
+                color : '#35caff',
+                font : { style : 'normal', size : '20px', type : 'Josefin Slab' },
+                origin : { x : 521, y : 485 },
+                text : 'LINES : ' + spec.lines
+            }),
+            scoreFont = Font({
+                color : '#35caff',
+                font : { style : 'normal', size : '20px', type : 'Josefin Slab' },
+                origin : { x : 725, y : 485 },
+                text : 'SCORE : ' + spec.score
+            }),
+            topScoreFont = Font({
+                color : '#35caff',
+                font : { style : 'normal', size : '20px', type : 'Josefin Slab' },
+                origin : { x : 680, y : 425 },
+                text : 'TOP SCORE : ' + spec.topScore
+            });
+
+        that.draw = function() {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(475, 375, 450, 150);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(166, 241, 255, 1)';
+            ctx.stroke();
+            ctx.restore();
+
+            levelFont.draw();
+            linesFont.draw();
+            scoreFont.draw();
+            topScoreFont.draw();
+
+        };
+
+        that.getLevel = function() {
+            return spec.level;
+        };
+
+        that.getLines = function() {
+            return spec.lines;
+        };
+
+        that.getScore = function() {
+            return spec.score;
+        };
+
+        that.getTopScore = function() {
+            return spec.topScore;
+        };
+
+        that.setLevel = function(level) {
+            spec.level = level;
+        };
+
+        that.setLines = function(lines) {
+            spec.lines = lines;
+        };
+
+        that.setScore = function(score) {
+            spec.score = score;
+        };
+
+        that.setTopScore = function(topScore) {
+            spec.topScore = topScore;
+        };
+
+        return that;
+    }
+
     function Texture(spec) {
         var that = {};
 
@@ -157,11 +256,17 @@ TETRIS.graphics = (function() {
             ctx.restore();
         };
 
+        that.setImage = function(img) {
+            spec.image = img;
+        };
+
         return that;
     }
 
     return {
         GameBoard : GameBoard,
+        StatScreen : StatScreen,
+        Texture : Texture,
 
         clear : clear
     }
