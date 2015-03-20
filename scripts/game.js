@@ -7,14 +7,13 @@ TETRIS.screens['game'] = (function() {
 
     var cancelNextRequest = false,
         gameBoard = null,
-        keyboard = TETRIS.input.Keyboard(),
         scoreBoard = null,
         theHog = null;
 
     function init() {
         console.log('Tetris initializing...');
 
-        keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
 
@@ -71,10 +70,40 @@ TETRIS.screens['game'] = (function() {
     }
 
     function update() {
-        keyboard.update(TETRIS.elapsedTime);
+        TETRIS.keyboard.update(TETRIS.elapsedTime);
+    }
+
+    function rotateLeft(){
+        console.log("Rotating Left");
+    }
+
+    function rotateRight(){
+        console.log("Rotating Right");
+    }
+
+    function moveLeft(){
+        console.log("Moving Left");
+    }
+
+    function moveRight(){
+        console.log("Moving Right");
+    }
+
+    function hardDrop(){
+        console.log("Hard Dropping");
+    }
+
+    function softDrop(){
+        console.log("Soft Dropping");
     }
 
     return {
+        moveLeft : moveLeft,
+        moveRight : moveRight,
+        softDrop : softDrop,
+        hardDrop : hardDrop,
+        rotateLeft : rotateLeft,
+        rotateRight : rotateRight,
         init : init,
         run : run
     };

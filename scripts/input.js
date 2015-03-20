@@ -32,6 +32,29 @@ TETRIS.input = (function(){
                 key : key,
                 handler : handler
             });
+            console.log("Registered: " + key);
+        };
+
+        that.printHandlers = function(){
+            var i = 0;
+
+            for(i; i < that.handlers.length; i++)
+            {
+                console.log(that.handlers[i].key);
+            }
+
+        };
+
+        that.unregisterCommand = function(keyCode){
+            var i = 0;
+            for(i; i < that.handlers.length; i++)
+            {
+                if(that.handlers[i].key === keyCode)
+                {
+                    console.log("Unregistered: " + that.handlers[i].key);
+                    that.handlers.splice(i,1);
+                }
+            }
         };
 
         that.update = function(elapsedTime) {
