@@ -167,8 +167,18 @@ TETRIS.screens['controls'] = (function() {
             ];
     }
 
+    function showBindText() {
+        document.getElementById('controls-bind-text').style.visibility = 'visible';
+    }
+
+    function hideBindText() {
+        document.getElementById('controls-bind-text').style.visibility = 'hidden';
+    }
+
     return {
         init : init,
-        run : run
+        hideBindText : hideBindText,
+        run : run,
+        showBindText : showBindText
     };
     }());

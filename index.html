@@ -34,6 +34,7 @@
         </div>
         <div id="controls" class="screen">
             <h1 id="control-title">CONTROLS</h1>
+            <div id="controls-bind-text"><< Press any key to bind! >></div>
             <div class="float-left">
                 <ul id="controls-label-list">
                     <li class="controls-label">Move Left</li><br/>
@@ -46,12 +47,12 @@
             </div>
             <div class="float-right">
                 <ul id="controls-box-list">
-                    <li class="controls-box"><textarea id="left-control" class="control-change-key-box" readonly></textarea></li><br/>
-                    <li class="controls-box"><textarea id="right-control" class="control-change-key-box" readonly></textarea></li><br/>
-                    <li class="controls-box"><textarea id="left-rotate-control" class="control-change-key-box" readonly></textarea></li><br/>
-                    <li class="controls-box"><textarea id="right-rotate-control" class="control-change-key-box" readonly></textarea></li><br/>
-                    <li class="controls-box"><textarea id="soft-drop-control" class="control-change-key-box" readonly></textarea></li><br/>
-                    <li class="controls-box"><textarea id="hard-drop-control" class="control-change-key-box" readonly></textarea></li>
+                    <li class="controls-box"><textarea id="left-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="right-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="left-rotate-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="right-rotate-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="soft-drop-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li><br/>
+                    <li class="controls-box"><textarea id="hard-drop-control" class="control-change-key-box" onfocus="TETRIS.screens['controls'].showBindText()"  onblur="TETRIS.screens['controls'].hideBindText()" readonly></textarea></li>
                 </ul>
             </div>
             <button id="controls-back" class="back-button">Back</button>
