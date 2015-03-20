@@ -7,12 +7,14 @@ TETRIS.screens['controls'] = (function() {
     var arrayID = [{key: 'A',id : 'left-control', value : KeyEvent.DOM_VK_A},{key : 'D', id: 'right-control', value : KeyEvent.DOM_VK_D},{key : 'Q', id: 'left-rotate-control', value: KeyEvent.DOM_VK_Q},
             {key : 'E', id: 'right-rotate-control', value:KeyEvent.DOM_VK_E},{key : 'S', id: 'soft-drop-control',value:KeyEvent.DOM_VK_S},{key : 'X', id:'hard-drop-control', value:KeyEvent.DOM_VK_X}],
         newKeyCode,
-        newKeyChar;
+        newKeyChar,
+        KeyCodes = {};
 
     function init() {
         document.getElementById('controls-back').addEventListener('click', function () {
             TETRIS.main.showScreen('menu');
         }, false);
+        setKeys();
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_A, function() {TETRIS.game.moveLeft();});
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_D, function() {TETRIS.game.moveRight();});
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_S, function() {TETRIS.game.softDrop();});
@@ -22,10 +24,36 @@ TETRIS.screens['controls'] = (function() {
     }
 
     function getKeyCode(e) {
+        var i = 0,
+            duplicate = false;
         newKeyCode = e.keyCode;
         console.log("The Key Code is: " + newKeyCode);
-        newKeyChar = String.fromCharCode(e.which).toUpperCase();
-        updateControls();
+        if(newKeyCode < 48 || newKeyCode > 90) {
+            newKeyChar = getSymbols(newKeyCode).toUpperCase();
+        }
+        else {
+            newKeyChar = String.fromCharCode(e.which).toUpperCase();
+        }
+        for(i; i < arrayID.length; i++) {
+            if(arrayID[i].value === newKeyCode) {
+                duplicate = true;
+            }
+        }
+        if(!duplicate){
+            updateControls();
+        }
+    }
+
+    function getSymbols(code){
+
+        for(var i = 0; i < KeyCodes.length; i++)
+        {
+            if(KeyCodes[i].keyCode === code)
+            {
+                return KeyCodes[i].icon;
+            }
+        }
+        return String.fromCharCode(code);
     }
 
     function updateControls(){
@@ -84,7 +112,7 @@ TETRIS.screens['controls'] = (function() {
     function addListener(){
         var id = document.activeElement.id,
             node = document.getElementById(id);
-            node.addEventListener('keypress', getKeyCode,false);
+            node.addEventListener('keydown', getKeyCode,false);
     }
 
     function displayUserControls(){
@@ -94,7 +122,7 @@ TETRIS.screens['controls'] = (function() {
         for(i ; i < arrayID.length; i++)
         {
             node = document.getElementById(arrayID[i].id);
-            node.innerHTML = arrayID[i].key + ' Key';
+            node.innerHTML = arrayID[i].key;
         }
     }
 
@@ -109,8 +137,36 @@ TETRIS.screens['controls'] = (function() {
         }
     }
 
+    function setKeys() {
+            KeyCodes = [
+                {keyCode : 37, icon : 'left arrow'},
+                {keyCode : 38, icon : 'up arrow'},
+                {keyCode : 39, icon: 'right arrow'},
+                {keyCode : 40, icon : 'down arrow'},
+                {keyCode : 17, icon : 'ctrl'},
+                {keyCode : 18, icon : 'alt'},
+                {keyCode : 16, icon : 'shift'},
+                {keyCode : 191, icon : '/'},
+                {keyCode : 190, icon : '.'},
+                {keyCode : 188, icon : ','},
+                {keyCode : 20, icon : 'capslock'},
+                {keyCode : 9, icon: 'tab'},
+                {keyCode : 192, icon : '`'},
+                {keyCode : 189, icon: '-'},
+                {keyCode :187, icon: '='},
+                {keyCode :8, icon : 'backspace'},
+                {keyCode : 220, icon: '\\'},
+                {keyCode :221, icon: ']'},
+                {keyCode :219, icon: '['},
+                {keyCode : 13, icon: 'enter'},
+                {keyCode : 222, icon: '\''},
+                {keyCode : 186, icon: ';'},
+                {keyCode : 32, icon: 'space bar'}
+            ];
+    }
+
     return {
         init : init,
         run : run
     };
-}());
+    }());
