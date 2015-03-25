@@ -38,6 +38,7 @@ TETRIS.objects = (function() {
             isBottom = true,
             isLeft = true,
             isRight = true,
+            isTop = true,
 
             pieceImage = null,
             location = { x : 0, y : 0};
@@ -91,6 +92,7 @@ TETRIS.objects = (function() {
             isBottom = true;
             isLeft = true;
             isRight = true;
+            isTop = true;
 
             brothers.length = 0;
             bottoms.length = 0;
@@ -112,7 +114,7 @@ TETRIS.objects = (function() {
                     if (location.x === brothers[i].getXLocation()) {
                         if (location.y < brothers[i].getYLocation()) {
                             isBottom = false;
-                            return isBottom;
+                            return false;
                         }
                     }
                 }
@@ -134,6 +136,7 @@ TETRIS.objects = (function() {
                     if(location.y === brothers[i].getYLocation()) {
                         if(location.x > brothers[i].getXLocation()) {
                             isLeft = false;
+                            return false;
                         }
                     }
                 }
@@ -155,6 +158,7 @@ TETRIS.objects = (function() {
                     if(location.y === brothers[i].getYLocation()) {
                         if(location.x < brothers[i].getXLocation()) {
                             isRight = false;
+                            return false;
                         }
                     }
                 }
@@ -162,7 +166,27 @@ TETRIS.objects = (function() {
             return isRight;
         };
 
+        that.isATopPiece = function() {
+            var i = 0,
+                length = brothers.length;
 
+            if(length === 0) {
+                isTop = true;
+                return isTop;
+            }
+
+            if(changeInShapeOccurred) {
+                for(i = 0; i < length; ++i) {
+                    if(location.x === brothers[i].getXLocation()) {
+                        if(location.y > brothers[i].getYLocation()) {
+                            isTop = false;
+                            return false;
+                        }
+                    }
+                }
+            }
+            return isTop;
+        };
 
         that.openBelow = function() {
             if(TETRIS.grid.isEmpty(location.x, location.y + 1)) {
@@ -196,6 +220,8 @@ TETRIS.objects = (function() {
             that.isABottomPiece();
             that.isARightPiece();
             that.isALeftPiece();
+            that.isATopPiece();
+            changeInShapeOccurred = false;
         };
 
         that.setXLocation = function(x) {
@@ -323,9 +349,12 @@ TETRIS.objects = (function() {
                 currentPiece = pieces[i];
                 x = currentPiece.getXLocation();
                 y = currentPiece.getYLocation();
-                grid[x][y] = null;
                 grid[x][y+1] = currentPiece;
                 currentPiece.setYLocation(y+1);
+
+                if(currentPiece.isATopPiece()) {
+                    grid[x][y] = null;
+                }
             }
         };
 
@@ -341,9 +370,12 @@ TETRIS.objects = (function() {
                 currentPiece = pieces[i];
                 x = currentPiece.getXLocation();
                 y = currentPiece.getYLocation();
-                grid[x][y] = null;
                 grid[x-1][y] = currentPiece;
                 currentPiece.setXLocation(x-1);
+
+                if(currentPiece.isARightPiece()) {
+                    grid[x][y] = null;
+                }
             }
         };
 
@@ -359,9 +391,12 @@ TETRIS.objects = (function() {
                 currentPiece = pieces[i];
                 x = currentPiece.getXLocation();
                 y = currentPiece.getYLocation();
-                grid[x][y] = null;
                 grid[x+1][y] = currentPiece;
                 currentPiece.setXLocation(x+1);
+
+                if(currentPiece.isALeftPiece()) {
+                    grid[x][y] = null;
+                }
             }
         };
 
