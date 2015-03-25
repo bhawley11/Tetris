@@ -112,6 +112,7 @@ TETRIS.objects = (function() {
                     if (location.x === brothers[i].getXLocation()) {
                         if (location.y < brothers[i].getYLocation()) {
                             isBottom = false;
+                            return isBottom;
                         }
                     }
                 }
@@ -160,6 +161,8 @@ TETRIS.objects = (function() {
             }
             return isRight;
         };
+
+
 
         that.openBelow = function() {
             if(TETRIS.grid.isEmpty(location.x, location.y + 1)) {
@@ -310,7 +313,7 @@ TETRIS.objects = (function() {
 
         that.moveShapeDown = function(shape) {
             var currentPiece = null,
-                pieces = shape.getPieces,
+                pieces = shape.getPieces(),
                 length = pieces.length,
                 i = 0,
                 x = 0,
@@ -328,7 +331,7 @@ TETRIS.objects = (function() {
 
         that.moveShapeLeft = function(shape) {
             var currentPiece = null,
-                pieces = shape.getPieces,
+                pieces = shape.getPieces(),
                 length = pieces.length,
                 i = 0,
                 x = 0,
@@ -346,7 +349,7 @@ TETRIS.objects = (function() {
 
         that.moveShapeRight = function(shape) {
             var currentPiece = null,
-                pieces = shape.getPieces,
+                pieces = shape.getPieces(),
                 length = pieces.length,
                 i = 0,
                 x = 0,
