@@ -13,6 +13,9 @@ TETRIS.screens['game'] = (function() {
     function init() {
         console.log('Tetris initializing...');
 
+        TETRIS.grid = TETRIS.objects.Grid();
+        TETRIS.grid.init();
+
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
@@ -53,6 +56,7 @@ TETRIS.screens['game'] = (function() {
         gameBoard.draw();
         scoreBoard.draw();
         theHog.draw();
+        TETRIS.grid.draw();
     }
 
     function run() {
@@ -60,6 +64,14 @@ TETRIS.screens['game'] = (function() {
             cancelAnimationFrame(TETRIS.sessionID);
             TETRIS.sessionID = null;
         }
+
+        /**** DELETE THIS, TESTING ONLY ****/
+
+        var shape1 = TETRIS.objects.Shape('RZ');
+        if(shape1.canSpawn()) {
+            shape1.spawn();
+        }
+        /**********************************/
 
         TETRIS.menuMusic.pause();
         TETRIS.lastTime = performance.now();
