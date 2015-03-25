@@ -15,6 +15,7 @@ TETRIS.screens['game'] = (function() {
 
         TETRIS.grid = TETRIS.objects.Grid();
         TETRIS.grid.init();
+        TETRIS.currentShape = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             cancelNextRequest = true;
@@ -43,10 +44,9 @@ TETRIS.screens['game'] = (function() {
     function gameLoop(time) {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
-
         update();
         render();
-
+        TETRIS.particleSystem.update(TETRIS.elapsedTime);
         if (!cancelNextRequest) {
             TETRIS.sessionID = requestAnimationFrame(gameLoop);
         }
@@ -68,9 +68,9 @@ TETRIS.screens['game'] = (function() {
 
         /**** DELETE THIS, TESTING ONLY ****/
 
-        var shape1 = TETRIS.objects.Shape('RZ');
-        if(shape1.canSpawn()) {
-            shape1.spawn();
+        TETRIS.currentShape = TETRIS.objects.Shape('RZ');
+        if(TETRIS.currentShape.canSpawn()) {
+            TETRIS.currentShape.spawn();
         }
         /**********************************/
 
@@ -95,18 +95,22 @@ TETRIS.screens['game'] = (function() {
 
     function moveLeft(){
         console.log("Moving Left");
+        TETRIS.currentShape.moveLeft();
     }
 
     function moveRight(){
         console.log("Moving Right");
+        TETRIS.currentShape.moveRight();
     }
 
     function hardDrop(){
         console.log("Hard Dropping");
+        TETRIS.currentShape.hardDrop();
     }
 
     function softDrop(){
         console.log("Soft Dropping");
+        TETRIS.currentShape.fall();
     }
 
     return {

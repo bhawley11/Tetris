@@ -263,11 +263,20 @@ TETRIS.graphics = (function() {
         return that;
     }
 
+    function drawParticles(particle){
+        ctx.save();
+        ctx.translate(particle.center.x, particle.center.y);
+        ctx.rotate(particle.rotation);
+        ctx.translate(-particle.center.x, -particle.center.y);
+        ctx.drawImage(particle.image, particle.center.x - particle.size/2, particle.center.y - particle.size/2, particle.size, particle.size);
+        ctx.restore();
+    }
+
     return {
         GameBoard : GameBoard,
         StatScreen : StatScreen,
         Texture : Texture,
-
+        drawParticles : drawParticles,
         clear : clear
     }
 }());
