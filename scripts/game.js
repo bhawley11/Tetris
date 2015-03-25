@@ -8,7 +8,8 @@ TETRIS.screens['game'] = (function() {
     var cancelNextRequest = false,
         gameBoard = null,
         scoreBoard = null,
-        theHog = null;
+        theHog = null,
+        ticTime = 0;
 
     function init() {
         console.log('Tetris initializing...');
@@ -44,8 +45,14 @@ TETRIS.screens['game'] = (function() {
     function gameLoop(time) {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
-        update();
-        render();
+        ticTime += TETRIS.elapsedTime;
+        if(ticTime/1000 > 1) {
+            TETRIS.currentShape.fall();
+            ticTime = 0;
+        }
+            update();
+            render();
+
         TETRIS.particleSystem.update(TETRIS.elapsedTime);
         if (!cancelNextRequest) {
             TETRIS.sessionID = requestAnimationFrame(gameLoop);
