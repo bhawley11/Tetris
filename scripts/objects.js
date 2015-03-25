@@ -62,7 +62,7 @@ TETRIS.objects = (function() {
             TETRIS.graphics.Texture({
                 image : pieceImage,
                 center : { x : 35 * x + 17.5 + 75, y : 35 * y + 17.5 + 50 },
-                width : 33.5, height : 33.5
+                width : 35, height : 35
             }).draw();
         };
 
