@@ -163,7 +163,11 @@ TETRIS.screens['controls'] = (function() {
                 {keyCode : 13, icon: 'enter'},
                 {keyCode : 222, icon: '\''},
                 {keyCode : 186, icon: ';'},
-                {keyCode : 32, icon: 'space bar'}
+                {keyCode : 32, icon: 'space bar'},
+                {keyCode : 33, icon: 'page up'},
+                {keyCode : 34, icon: 'page down'},
+                {keyCode : 36, icon: 'home'},
+                {keyCode : 35, icon: 'end'}
             ];
     }
 

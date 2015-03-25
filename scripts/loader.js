@@ -46,6 +46,8 @@ window.addEventListener('load', function() {
                 'preload!images/title.png',
 
                 /* SCRIPTS */
+                'preload!scripts/random.js',
+                'preload!scripts/particleSystem.js',
                 'preload!scripts/render.js',
                 'preload!scripts/persistence.js',
                 'preload!scripts/input.js',
