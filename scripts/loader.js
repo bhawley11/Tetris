@@ -55,6 +55,8 @@ window.addEventListener('load', function() {
 
                 /* SCRIPTS */
                 'preload!scripts/objects.js',
+                'preload!scripts/random.js',
+                'preload!scripts/particleSystem.js',
                 'preload!scripts/render.js',
                 'preload!scripts/persistence.js',
                 'preload!scripts/input.js',

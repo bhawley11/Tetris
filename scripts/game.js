@@ -44,10 +44,9 @@ TETRIS.screens['game'] = (function() {
     function gameLoop(time) {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
-
         update();
         render();
-
+        TETRIS.particleSystem.update(TETRIS.elapsedTime);
         if (!cancelNextRequest) {
             TETRIS.sessionID = requestAnimationFrame(gameLoop);
         }
