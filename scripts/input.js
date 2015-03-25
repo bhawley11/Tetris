@@ -11,6 +11,7 @@
  ***************************/
 
 TETRIS.input = (function(){
+    var inputRestraint = 0;
 
     function Keyboard() {
         var that = {
@@ -58,10 +59,14 @@ TETRIS.input = (function(){
         };
 
         that.update = function(elapsedTime) {
-            for (key = 0; key < that.handlers.length; ++key) {
-                if (that.keys.hasOwnProperty(that.handlers[key].key)) {
-                    that.handlers[key].handler(elapsedTime);
+            inputRestraint += elapsedTime;
+            if(inputRestraint/1000 > .25) {
+                for (key = 0; key < that.handlers.length; ++key) {
+                    if (that.keys.hasOwnProperty(that.handlers[key].key)) {
+                        that.handlers[key].handler(elapsedTime);
+                    }
                 }
+                inputRestraint = 0;
             }
         };
 
