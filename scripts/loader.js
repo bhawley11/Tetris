@@ -45,7 +45,16 @@ window.addEventListener('load', function() {
 
                 'preload!images/title.png',
 
+                'preload!images/squares/blue_square.png',
+                'preload!images/squares/brown_square.png',
+                'preload!images/squares/gray_square.png',
+                'preload!images/squares/green_square.png',
+                'preload!images/squares/light_blue_square.png',
+                'preload!images/squares/navy_square.png',
+                'preload!images/squares/orange_square.png',
+
                 /* SCRIPTS */
+                'preload!scripts/objects.js',
                 'preload!scripts/render.js',
                 'preload!scripts/persistence.js',
                 'preload!scripts/input.js',
