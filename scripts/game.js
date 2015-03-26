@@ -9,7 +9,9 @@ TETRIS.screens['game'] = (function() {
         gameBoard = null,
         scoreBoard = null,
         theHog = null,
-        ticTime = 0;
+        ticTime = 0,
+        shapeHistory = [],
+        listOfShapes = ['B','LL','RL','LZ','RZ','T','I'];
 
     function init() {
         console.log('Tetris initializing...');
@@ -17,11 +19,11 @@ TETRIS.screens['game'] = (function() {
         TETRIS.grid = TETRIS.objects.Grid();
         TETRIS.grid.init();
         TETRIS.currentShape = null;
+        TETRIS.nextShape = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
-
         });
 
         gameBoard = TETRIS.graphics.GameBoard({
@@ -46,9 +48,17 @@ TETRIS.screens['game'] = (function() {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
-        if(ticTime/1000 > 1) {
-            TETRIS.currentShape.fall();
-            ticTime = 0;
+        if(ticTime/1000 > .75) {
+            if(TETRIS.currentShape.fall()){
+            }
+            else{
+                TETRIS.currentShape = TETRIS.nextShape;
+                if (TETRIS.currentShape.canSpawn()) {
+                    TETRIS.currentShape.spawn();
+                }
+                TETRIS.nextShape = TETRIS.objects.Shape(nextShape());
+            }
+            ticTime= 0;
         }
             update();
             render();
@@ -67,19 +77,51 @@ TETRIS.screens['game'] = (function() {
         TETRIS.grid.draw();
     }
 
+    function nextShape(){
+        var i = 0,
+            randomChoice = listOfShapes[Math.floor(Math.random()*listOfShapes.length)];
+
+            for(i; i<6;i++){
+                if(inHistory(randomChoice)){
+                    randomChoice = listOfShapes[Math.floor(Math.random()*listOfShapes.length)];
+                }
+                else{
+                    shapeHistory.splice(0,1);
+                    shapeHistory.push(randomChoice);
+                    return randomChoice;
+                }
+            }
+        shapeHistory.splice(0,1);
+        shapeHistory.push(randomChoice);
+        return randomChoice;
+    }
+
+    function inHistory(shape){
+        var i = 0;
+        for(i; i < shapeHistory.length; i++){
+            if(shape === shapeHistory[i]){
+                return true;
+            }
+        }
+        return false;
+    }
+
     function run() {
         if(TETRIS.sessionID != null) {
             cancelAnimationFrame(TETRIS.sessionID);
             TETRIS.sessionID = null;
         }
 
-        /**** DELETE THIS, TESTING ONLY ****/
+        for(var i = 0; i < 4; i++)
+        {
+            shapeHistory.push('LZ');
+        }
 
-        TETRIS.currentShape = TETRIS.objects.Shape('LL');
+        TETRIS.currentShape = TETRIS.objects.Shape(nextShape());
         if(TETRIS.currentShape.canSpawn()) {
             TETRIS.currentShape.spawn();
         }
-        /**********************************/
+        TETRIS.nextShape = TETRIS.objects.Shape(nextShape());
 
         TETRIS.menuMusic.pause();
         TETRIS.lastTime = performance.now();
