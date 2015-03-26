@@ -75,7 +75,7 @@ TETRIS.screens['game'] = (function() {
 
         /**** DELETE THIS, TESTING ONLY ****/
 
-        TETRIS.currentShape = TETRIS.objects.Shape('RZ');
+        TETRIS.currentShape = TETRIS.objects.Shape('LL');
         if(TETRIS.currentShape.canSpawn()) {
             TETRIS.currentShape.spawn();
         }
@@ -94,10 +94,12 @@ TETRIS.screens['game'] = (function() {
 
     function rotateLeft(){
         console.log("Rotating Left");
+        TETRIS.currentShape.rotate('l');
     }
 
     function rotateRight(){
         console.log("Rotating Right");
+        TETRIS.currentShape.rotate('r');
     }
 
     function moveLeft(){
