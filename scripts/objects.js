@@ -49,6 +49,10 @@ TETRIS.objects = (function() {
             brothers.push(piece3);
         };
 
+        that.clearBrothers = function() {
+            brothers.length = 0;
+        };
+
         that.deletePiece = function() {
             var i = 0,
                 length = brothers.length;
@@ -62,7 +66,7 @@ TETRIS.objects = (function() {
         that.draw = function(x,y) {
             TETRIS.graphics.Texture({
                 image : pieceImage,
-                center : { x : 35 * x + 17.5 + 75, y : 35 * y + 17.5 + 50 },
+                center : { x : 35 * x + 17.5 + 75, y : 35 * y + 67.5 - 70 /* -70 because of the invisible top two rows */ },
                 width : 35, height : 35
             }).draw();
         };
@@ -75,12 +79,32 @@ TETRIS.objects = (function() {
             return brothers;
         };
 
+        that.getIsBottom = function() {
+            return isBottom;
+        };
+
+        that.getIsLeft = function() {
+            return isLeft;
+        };
+
+        that.getIsRight = function() {
+            return isRight;
+        };
+
+        that.getIsTop = function() {
+            return isTop;
+        };
+
         that.getXLocation = function() {
             return location.x;
         };
 
         that.getYLocation = function() {
             return location.y;
+        };
+
+        that.hasChanged = function() {
+            that.setPieceKnowledge();
         };
 
         that.init = function(coords, image) {
@@ -104,109 +128,102 @@ TETRIS.objects = (function() {
             var i = 0,
                 length = brothers.length;
 
+            isBottom = true;
+
             if(length === 0) {         // If I'm the only piece, I am a bottom
-                isBottom = true;
                 return isBottom;
             }
 
-            if(changeInShapeOccurred) {         // We only want to run through this loop if the shape has changed, otherwise it's the same. Change occurs on rotation or deletion of piece
-                for (i = 0; i < length; ++i) {
-                    if (location.x === brothers[i].getXLocation()) {
-                        if (location.y < brothers[i].getYLocation()) {
-                            isBottom = false;
-                            return false;
-                        }
+           // We only want to run through this loop if the shape has changed, otherwise it's the same. Change occurs on rotation or deletion of piece
+            for (i = 0; i < length; ++i) {
+                if (location.x === brothers[i].getXLocation()) {
+                    if (location.y < brothers[i].getYLocation()) {
+                        isBottom = false;
+                        return false;
                     }
                 }
             }
-            return isBottom;
-        };
+    };
 
         that.isALeftPiece = function() {
             var i = 0,
                 length = brothers.length;
 
+            isLeft = true;
+
             if(length === 0) {         // If I'm the only piece, I am the left most piece
-                isLeft = true;
                 return isLeft;
             }
 
-            if(changeInShapeOccurred) {
-                for(i = 0; i < length; ++i) {
-                    if(location.y === brothers[i].getYLocation()) {
-                        if(location.x > brothers[i].getXLocation()) {
-                            isLeft = false;
-                            return false;
-                        }
+            for(i = 0; i < length; ++i) {
+                if (location.y === brothers[i].getYLocation()) {
+                    if (location.x > brothers[i].getXLocation()) {
+                        isLeft = false;
+                        return false;
                     }
                 }
             }
-            return isLeft;
         };
 
         that.isARightPiece = function() {
             var i = 0,
                 length = brothers.length;
 
+            isRight = true;
+
             if(length === 0) {
-                isRight = true;
                 return isRight;
             }
 
-            if(changeInShapeOccurred) {
-                for(i = 0; i < length; ++i) {
-                    if(location.y === brothers[i].getYLocation()) {
-                        if(location.x < brothers[i].getXLocation()) {
-                            isRight = false;
-                            return false;
-                        }
+            for(i = 0; i < length; ++i) {
+                if(location.y === brothers[i].getYLocation()) {
+                    if(location.x < brothers[i].getXLocation()) {
+                        isRight = false;
+                        return false;
                     }
                 }
             }
-            return isRight;
         };
 
         that.isATopPiece = function() {
             var i = 0,
                 length = brothers.length;
 
+            isTop = true;
+
             if(length === 0) {
-                isTop = true;
                 return isTop;
             }
-
-            if(changeInShapeOccurred) {
-                for(i = 0; i < length; ++i) {
-                    if(location.x === brothers[i].getXLocation()) {
-                        if(location.y > brothers[i].getYLocation()) {
-                            isTop = false;
-                            return false;
-                        }
+            for(i = 0; i < length; ++i) {
+                if(location.x === brothers[i].getXLocation()) {
+                    if(location.y > brothers[i].getYLocation()) {
+                        isTop = false;
+                        return false;
                     }
                 }
             }
-            return isTop;
         };
 
         that.openBelow = function() {
-            if(TETRIS.grid.isEmpty(location.x, location.y + 1)) {
-              return true;
-            }
-            return false;
+            return (TETRIS.grid.isEmpty(location.x, location.y + 1));
         };
 
         that.openLeft = function() {
-            if(TETRIS.grid.isEmpty(location.x - 1, location.y)) {
-                return true;
-            }
-            return false;
+            return (TETRIS.grid.isEmpty(location.x - 1, location.y));
         };
 
         that.openRight = function() {
-            if(TETRIS.grid.isEmpty(location.x + 1, location.y)) {
-                return true;
-            }
-            return false;
+            return (TETRIS.grid.isEmpty(location.x + 1, location.y));
+        };
+
+        that.printDetails = function() {
+            console.log('X: ' + location.x);
+            console.log('Y: ' + location.y);
+            console.log('Is a Top Piece: ' + isTop);
+            console.log('Is a Right Piece: ' + isRight);
+            console.log('Is a Bottom Piece: ' + isBottom);
+            console.log('Is a Left Piece: ' + isLeft);
+            console.log('\n');
         };
 
         that.removeBrother = function(piece) {
@@ -256,7 +273,7 @@ TETRIS.objects = (function() {
 
             withinBounds = function(x,y) {
                 if(x >= 0 && x < 10) {
-                    if(y >= 0 && y < 20) {
+                    if(y >= 0 && y < 22) {
                         return true;
                     }
                 }
@@ -270,11 +287,11 @@ TETRIS.objects = (function() {
         that.draw = function() {
             var i = 0,
                 j = 0,
-                rows = 20,
+                rows = 22,
                 columns = 10;
 
             for(i = 0; i < columns; ++i) {
-                for(j = 0; j < rows; ++j) {
+                for(j = 2; j < rows; ++j) {
                     if(grid[i][j] !== null) {
                         grid[i][j].draw(i, j);
                     }
@@ -285,7 +302,7 @@ TETRIS.objects = (function() {
         that.init = function() {
             var i = 0,
                 j = 0,
-                rows = 20,
+                rows = 22,
                 columns = 10;
 
             for(i = 0; i < columns; ++i) {
@@ -319,7 +336,7 @@ TETRIS.objects = (function() {
 
             while(allClear) {
                 for (i = 0; i < length; ++i) {
-                    if (brothers[i].isABottomPiece() && !(brothers[i].openBelow())) {
+                    if (brothers[i].getIsBottom() && !(brothers[i].openBelow())) {
                         allClear = false;
                     }
                 }
@@ -352,7 +369,7 @@ TETRIS.objects = (function() {
                 grid[x][y+1] = currentPiece;
                 currentPiece.setYLocation(y+1);
 
-                if(currentPiece.isATopPiece()) {
+                if(currentPiece.getIsTop()) {
                     grid[x][y] = null;
                 }
             }
@@ -373,7 +390,7 @@ TETRIS.objects = (function() {
                 grid[x-1][y] = currentPiece;
                 currentPiece.setXLocation(x-1);
 
-                if(currentPiece.isARightPiece()) {
+                if(currentPiece.getIsRight()) {
                     grid[x][y] = null;
                 }
             }
@@ -394,9 +411,61 @@ TETRIS.objects = (function() {
                 grid[x+1][y] = currentPiece;
                 currentPiece.setXLocation(x+1);
 
-                if(currentPiece.isALeftPiece()) {
+                if(currentPiece.getIsLeft()) {
                     grid[x][y] = null;
                 }
+            }
+        };
+
+        that.moveShapeTo = function(pieces, locations) {
+            var currentPiece = null,
+                length = pieces.length,
+                i = 0,
+                x = 0,
+                y = 0;
+
+            for(i = 0; i < length; ++i) {       // Erase old piece locations if they've changed
+                if(pieces[i].hasChanged) {
+                    currentPiece = pieces[i].piece;
+                    x = currentPiece.getXLocation();
+                    y = currentPiece.getYLocation();
+                    grid[x][y] = null;
+                }
+            }
+
+            for(i = 0; i < length; ++i) {       // Set new piece locations if they've changed
+                if (pieces[i].hasChanged) {
+                    currentPiece = pieces[i].piece;
+                    currentPiece.setXLocation(locations[i].x);
+                    currentPiece.setYLocation(locations[i].y);
+                    grid[locations[i].x][locations[i].y] = currentPiece;
+                }
+            }
+
+
+            for(i = 0; i < length; ++i) {
+                currentPiece = pieces[i].piece;
+                currentPiece.clearBrothers();   // We need to reset each pieces brother list
+
+                switch(i) {
+                    case 0:
+                        currentPiece.addBrothers(pieces[1].piece, pieces[2].piece, pieces[3].piece);
+                        break;
+                    case 1:
+                        currentPiece.addBrothers(pieces[0].piece, pieces[2].piece, pieces[3].piece);
+                        break;
+                    case 2:
+                        currentPiece.addBrothers(pieces[0].piece, pieces[1].piece, pieces[3].piece);
+                        break;
+                    case 3:
+                        currentPiece.addBrothers(pieces[0].piece, pieces[1].piece, pieces[2].piece);
+                        break;
+                }
+
+                currentPiece.hasChanged();
+
+                console.log('Piece ' + i);
+                currentPiece.printDetails();
             }
         };
 
@@ -434,23 +503,54 @@ TETRIS.objects = (function() {
     function Shape(s) {
         var that = {};
 
-        var shape = s,
-            pieces = [];
+        var pieces = [],
+            rotationState = 0,
+            shape = s,
+
+            attemptRotation = function(offsets) {
+                var clearToRotate = true,
+                    newLocations = [],
+                    pieceAndChanged = [],
+                    i = 0;
+
+                newLocations.length = 0;
+                pieceAndChanged.length = 0;
+
+                newLocations.push({x: pieces[0].getXLocation() + offsets.p0.x, y: pieces[0].getYLocation() + offsets.p0.y });
+                newLocations.push({x: pieces[1].getXLocation() + offsets.p1.x, y: pieces[1].getYLocation() + offsets.p1.y });
+                newLocations.push({x: pieces[2].getXLocation() + offsets.p2.x, y: pieces[2].getYLocation() + offsets.p2.y });
+                newLocations.push({x: pieces[3].getXLocation() + offsets.p3.x, y: pieces[3].getYLocation() + offsets.p3.y });
+
+                for (i = 0; i < 4; ++i) {
+                    pieceAndChanged.push({ piece : pieces[i], hasChanged : (newLocations[i].x !== pieces[i].getXLocation() || newLocations[i].y !== pieces[i].getYLocation()) });
+                }
+
+                for (i = 0; i < 4; ++i) {
+                    if (pieceAndChanged[i].hasChanged && !(TETRIS.grid.isEmpty(newLocations[i].x, newLocations[i].y))) {
+                        clearToRotate = false;
+                    }
+                }
+
+                if (clearToRotate) {
+                    TETRIS.grid.moveShapeTo(pieceAndChanged, newLocations);
+                }
+                return clearToRotate;
+            };
 
         that.canSpawn = function() {
             switch(shape) {
                 case 'B':
                     return (TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(5,0) && TETRIS.grid.isEmpty(5,1));
                 case 'LL':
-                    return (TETRIS.grid.isEmpty(5,0) && TETRIS.grid.isEmpty(5,1) && TETRIS.grid.isEmpty(5,2) && TETRIS.grid.isEmpty(4,2));
+                    return (TETRIS.grid.isEmpty(3,0) && TETRIS.grid.isEmpty(3,1) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(5,1));
                 case 'RL':
-                    return (TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(4,2) && TETRIS.grid.isEmpty(5,2));
+                    return (TETRIS.grid.isEmpty(3,1) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(5,1) && TETRIS.grid.isEmpty(5,0));
                 case 'LZ':
-                    return (TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(5,0) && TETRIS.grid.isEmpty(5,1) && TETRIS.grid.isEmpty(6,1));
+                    return (TETRIS.grid.isEmpty(3,0) && TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(5,1));
                 case 'RZ':
                     return (TETRIS.grid.isEmpty(3,1) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(5,0));
                 case 'T':
-                    return (TETRIS.grid.isEmpty(3,0) && TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(5,0) && TETRIS.grid.isEmpty(4,1));
+                    return (TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(3,1) && TETRIS.grid.isEmpty(4,1) && TETRIS.grid.isEmpty(5,1));
                 case 'I':
                     return (TETRIS.grid.isEmpty(3,0) && TETRIS.grid.isEmpty(4,0) && TETRIS.grid.isEmpty(5,0) && TETRIS.grid.isEmpty(6,0));
                 default:
@@ -464,7 +564,7 @@ TETRIS.objects = (function() {
                 allClear = true;
 
             for(i = 0; i < 4; ++i) {
-                if(pieces[i].isABottomPiece() && !(pieces[i].openBelow())) {     // It IS a bottom piece, but below is not open
+                if(pieces[i].getIsBottom() && !(pieces[i].openBelow())) {     // It IS a bottom piece, but below is not open
                     allClear = false;
                 }
             }
@@ -495,7 +595,7 @@ TETRIS.objects = (function() {
                 allClear = true;
 
             for(i = 0; i < 4; ++i) {
-                if(pieces[i].isALeftPiece() && !(pieces[i].openLeft())) {       // It IS a left piece, but left is not open
+                if(pieces[i].getIsLeft() && !(pieces[i].openLeft())) {       // It IS a left piece, but left is not open
                     allClear = false;
                 }
             }
@@ -510,7 +610,7 @@ TETRIS.objects = (function() {
                 allClear = true;
 
             for(i = 0; i < 4; ++i) {
-                if(pieces[i].isARightPiece() && !(pieces[i].openRight())) {
+                if(pieces[i].getIsRight() && !(pieces[i].openRight())) {
                     allClear = false;
                 }
             }
@@ -520,44 +620,190 @@ TETRIS.objects = (function() {
             }
         };
 
-        that.rotateLeft = function() {
-            switch(shape) {
-                case 'B':
-                    return; // Box's don't need to rotate
-                case 'LL':
-                    return;
-                case 'RL':
-                    return;
-                case 'LZ':
-                    return;
-                case 'RZ':
-                    return;
-                case 'T':
-                    return;
-                case 'I':
-                    return;
-            }
-            console.log('Shape is not registered: Rotate Left');
-        };
+        that.rotate = function(dir) {
+            var toState = 0,
+                i = 0,
+                length = 0;
 
-        that.rotateRight = function() {
+            // Select which state we want to rotate to depending on direction and start state
+            switch(dir) {
+                case 'r':
+                    if(rotationState < 3) {
+                        toState = rotationState + 1;
+                    }
+                    else {
+                        toState = 0;
+                    }
+                    break;
+                case 'l':
+                    if(rotationState > 0) {
+                        toState = rotationState - 1;
+                    }
+                    else {
+                        toState = 3;
+                    }
+                    break;
+            }
+
             switch(shape) {
                 case 'B':
                     return; // Box's don't need to rotate
                 case 'LL':
-                    return;
+                    switch(toState) {
+                        case 0:                     // Going to rotation state 0
+                            if(dir == 'r') {        // By rotating right
+                                if(attemptRotation({
+                                    p0 : { x : 0, y : -2 },
+                                    p1 : { x : -1, y : -1 },
+                                    p2 : { x : 0, y : 0 },
+                                    p3 : { x : 1, y : 1 }
+                                })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            else {
+                                if(attemptRotation({
+                                        p0 : { x : -2, y : 0 },
+                                        p1 : { x : -1, y : 1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : 1, y : -1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            break;
+                        case 1:
+                            if(dir == 'r') {
+                                if(attemptRotation({
+                                        p0 : { x : 2, y : 0 },
+                                        p1 : { x : 1, y : -1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : -1, y : 1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            else {
+                                if(attemptRotation({
+                                        p0 : { x : 0, y : -2 },
+                                        p1 : { x : -1, y : -1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : 1, y : 1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            break;
+                        case 2:
+                            if(dir == 'r') {
+                                if(attemptRotation({
+                                        p0 : { x : 0, y : 2 },
+                                        p1 : { x : 1, y : 1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : -1, y : -1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            else {
+                                if(attemptRotation({
+                                        p0 : { x : 2, y : 0 },
+                                        p1 : { x : 1, y : -1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : -1, y : 1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            break;
+                        case 3:
+                            if(dir == 'r') {
+                                if(attemptRotation({
+                                        p0 : { x : -2, y : 0 },
+                                        p1 : { x : -1, y : 1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : 1, y : -1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            else {
+                                if(attemptRotation({
+                                        p0 : { x : 0, y : 2 },
+                                        p1 : { x : 1, y : 1 },
+                                        p2 : { x : 0, y : 0 },
+                                        p3 : { x : -1, y : -1 }
+                                    })) {
+                                    rotationState = toState;
+                                }
+                            }
+                            break;
+                    }
+                    break;
                 case 'RL':
-                    return;
+                    switch(toState) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
                 case 'LZ':
-                    return;
+                    switch(toState) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
                 case 'RZ':
-                    return;
+                    switch(toState) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
                 case 'T':
-                    return;
+                    switch(toState) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
                 case 'I':
-                    return;
+                    switch(toState) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
+                default:
+                    console.log('Shape is not registered: Rotate');
+                    break;
             }
-            console.log('Shape is not registered: Rotate Right');
         };
 
         that.spawn = function() {
@@ -579,22 +825,22 @@ TETRIS.objects = (function() {
                     pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/green_square.png']);
                     break;
                 case 'LL':
-                    pieces[0].init({ x : 5, y : 0 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[1].init({ x : 5, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[2].init({ x : 5, y : 2 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[3].init({ x : 4, y : 2 }, TETRIS.images['images/squares/blue_square.png']);
+                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/blue_square.png']);
+                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
                     break;
                 case 'RL':
-                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/light_blue_square.png']);
+                    pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
                     pieces[1].init({ x : 4, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
-                    pieces[2].init({ x : 4, y : 2 }, TETRIS.images['images/squares/light_blue_square.png']);
-                    pieces[3].init({ x : 5, y : 2 }, TETRIS.images['images/squares/light_blue_square.png']);
+                    pieces[2].init({ x : 5, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
+                    pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/light_blue_square.png']);
                     break;
                 case 'LZ':
-                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[1].init({ x : 5, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[2].init({ x : 5, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[3].init({ x : 6, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
+                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
+                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
                     break;
                 case 'RZ':
                     pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/gray_square.png']);
@@ -603,10 +849,10 @@ TETRIS.objects = (function() {
                     pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/gray_square.png']);
                     break;
                 case 'T':
-                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[2].init({ x : 5, y : 0 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[3].init({ x : 4, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
+                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/brown_square.png']);
+                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
                     break;
                 case 'I':
                     pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/navy_square.png']);
@@ -627,6 +873,11 @@ TETRIS.objects = (function() {
             pieces[1].setPieceKnowledge();
             pieces[2].setPieceKnowledge();
             pieces[3].setPieceKnowledge();
+
+            pieces[0].printDetails();
+            pieces[1].printDetails();
+            pieces[2].printDetails();
+            pieces[3].printDetails();
         };
 
         return that;
