@@ -11,8 +11,7 @@
  ***************************/
 
 TETRIS.input = (function(){
-    var inputRestraint = 0;
-
+    var restraintTime = 0;
     function Keyboard() {
         var that = {
                 keys : {},
@@ -21,17 +20,36 @@ TETRIS.input = (function(){
             key;
 
         function keyPress(e) {
+            for(var i = 0; i < that.handlers.length; i++){
+                if(that.handlers[i].key === e.keyCode){
+                    that.handlers[i].lastFired = performance.now();
+                }
+            }
             that.keys[e.keyCode] = e.timeStamp;
         }
 
         function keyRelease(e) {
+            var tempTime = performance.now();
+            for(var i = 0; i < that.handlers.length; i++) {
+                if(that.handlers[i].key === e.keyCode) {
+                    if ((tempTime - that.handlers[i].lastFired) / 1000 < .25) {
+                        if(that.handlers[i].wasHeld === false){
+                            that.handlers[i].lastFired = tempTime;
+                            that.handlers[i].handler();
+                        }
+                    }
+                }
+                that.handlers[i].wasHeld = false;
+            }
             delete that.keys[e.keyCode];
         }
 
         that.registerCommand = function(key, handler) {
             that.handlers.push({
                 key : key,
-                handler : handler
+                handler : handler,
+                lastFired : 0,
+                wasHeld : false
             });
             console.log("Registered: " + key);
         };
@@ -59,15 +77,28 @@ TETRIS.input = (function(){
         };
 
         that.update = function(elapsedTime) {
-            inputRestraint += elapsedTime;
-            if(inputRestraint/1000 > .25) {
-                for (key = 0; key < that.handlers.length; ++key) {
-                    if (that.keys.hasOwnProperty(that.handlers[key].key)) {
-                        that.handlers[key].handler(elapsedTime);
+            var tempTime = performance.now();
+            restraintTime += elapsedTime;
+            for (key = 0; key < that.handlers.length; ++key) {
+                if (that.keys.hasOwnProperty(that.handlers[key].key)) {
+                    if(that.handlers[key].wasHeld === true){
+                        if(restraintTime/1000 > .25){
+                            that.handlers[key].lastFired = tempTime;
+                            restraintTime = 0;
+                            that.handlers[key].handler();
+                        }
+                    }
+                    else if(that.handlers[key].wasHeld === false){
+                        if(((tempTime - that.handlers[key].lastFired)/1000) > .25){
+                            that.handlers[key].wasHeld = true;
+                            restraintTime = 0;
+                            that.handlers[key].lastFired = tempTime;
+                            that.handlers[key].handler();
+                            }
+                        }
                     }
                 }
-                inputRestraint = 0;
-            }
+
         };
 
         window.addEventListener('keydown', keyPress.bind(that));
