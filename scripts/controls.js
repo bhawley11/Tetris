@@ -28,7 +28,6 @@ TETRIS.screens['controls'] = (function() {
             duplicate = false;
         if(e.keyCode != 27){
             newKeyCode = e.keyCode;
-            console.log("The Key Code is: " + newKeyCode);
             if (newKeyCode < 48 || newKeyCode > 90) {
                 newKeyChar = getSymbols(newKeyCode).toUpperCase();
             }
@@ -60,8 +59,6 @@ TETRIS.screens['controls'] = (function() {
 
     function updateControls(){
         var id = document.activeElement.id;
-
-        TETRIS.keyboard.printHandlers();
 
         if(id === 'left-control')
         {
@@ -105,9 +102,6 @@ TETRIS.screens['controls'] = (function() {
             arrayID[3].value = newKeyCode;
             arrayID[3].key = newKeyChar;
         }
-
-        TETRIS.keyboard.printHandlers();
-
         displayUserControls();
     }
 

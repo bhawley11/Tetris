@@ -51,17 +51,6 @@ TETRIS.input = (function(){
                 lastFired : 0,
                 wasHeld : false
             });
-            console.log("Registered: " + key);
-        };
-
-        that.printHandlers = function(){
-            var i = 0;
-
-            for(i; i < that.handlers.length; i++)
-            {
-                console.log(that.handlers[i].key);
-            }
-
         };
 
         that.unregisterCommand = function(keyCode){
@@ -70,7 +59,6 @@ TETRIS.input = (function(){
             {
                 if(that.handlers[i].key === keyCode)
                 {
-                    console.log("Unregistered: " + that.handlers[i].key);
                     that.handlers.splice(i,1);
                 }
             }
