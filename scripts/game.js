@@ -11,7 +11,8 @@ TETRIS.screens['game'] = (function() {
         theHog = null,
         ticTime = 0,
         shapeHistory = [],
-        listOfShapes = ['B','LL','RL','LZ','RZ','T','I'];
+        listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
+        gameOver = false;
 
     function init() {
         console.log('Tetris initializing...');
@@ -22,6 +23,7 @@ TETRIS.screens['game'] = (function() {
         TETRIS.nextShape = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
+            TETRIS.grid.clearGrid();
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
         });
@@ -49,12 +51,13 @@ TETRIS.screens['game'] = (function() {
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
         if(ticTime/1000 > .75) {
-            if(TETRIS.currentShape.fall()){
-            }
-            else{
+            if(!TETRIS.currentShape.fall()){
                 TETRIS.currentShape = TETRIS.nextShape;
                 if (TETRIS.currentShape.canSpawn()) {
                     TETRIS.currentShape.spawn();
+                }
+                else{
+                    gameOver = true;
                 }
                 TETRIS.nextShape = TETRIS.objects.Shape(nextShape());
             }
@@ -107,6 +110,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function run() {
+        gameOver = false;
         if(TETRIS.sessionID != null) {
             cancelAnimationFrame(TETRIS.sessionID);
             TETRIS.sessionID = null;
@@ -131,7 +135,13 @@ TETRIS.screens['game'] = (function() {
     }
 
     function update() {
-        TETRIS.keyboard.update(TETRIS.elapsedTime);
+        if(gameOver){
+
+        }
+        else{
+            TETRIS.keyboard.update(TETRIS.elapsedTime);
+        }
+
     }
 
     function rotateLeft(){
