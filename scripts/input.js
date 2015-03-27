@@ -20,26 +20,30 @@ TETRIS.input = (function(){
             key;
 
         function keyPress(e) {
-            for(var i = 0; i < that.handlers.length; i++){
-                if(that.handlers[i].key === e.keyCode){
-                    that.handlers[i].lastFired = performance.now();
+            if(TETRIS.onGameScreen){
+                for(var i = 0; i < that.handlers.length; i++){
+                    if(that.handlers[i].key === e.keyCode){
+                        that.handlers[i].lastFired = performance.now();
+                    }
                 }
             }
             that.keys[e.keyCode] = e.timeStamp;
         }
 
         function keyRelease(e) {
-            var tempTime = performance.now();
-            for(var i = 0; i < that.handlers.length; i++) {
-                if(that.handlers[i].key === e.keyCode) {
-                    if ((tempTime - that.handlers[i].lastFired) / 1000 < .25) {
-                        if(that.handlers[i].wasHeld === false){
-                            that.handlers[i].lastFired = tempTime;
-                            that.handlers[i].handler();
+            if(TETRIS.onGameScreen){
+                var tempTime = performance.now();
+                for(var i = 0; i < that.handlers.length; i++) {
+                    if(that.handlers[i].key === e.keyCode) {
+                        if ((tempTime - that.handlers[i].lastFired) / 1000 < .25) {
+                            if(that.handlers[i].wasHeld === false){
+                                that.handlers[i].lastFired = tempTime;
+                                that.handlers[i].handler();
+                            }
                         }
                     }
+                    that.handlers[i].wasHeld = false;
                 }
-                that.handlers[i].wasHeld = false;
             }
             delete that.keys[e.keyCode];
         }
