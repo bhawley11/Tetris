@@ -48,6 +48,10 @@ TETRIS.input = (function(){
             delete that.keys[e.keyCode];
         }
 
+        that.clearKeyboardState = function(){
+            that.keys = {};
+        };
+
         that.registerCommand = function(key, handler) {
             that.handlers.push({
                 key : key,
