@@ -113,6 +113,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function run() {
+        TETRIS.keyboard.clearKeyboardState();
         gameOver = false;
         TETRIS.onGameScreen = true;
         if(TETRIS.sessionID != null) {
