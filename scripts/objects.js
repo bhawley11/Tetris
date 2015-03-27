@@ -124,6 +124,18 @@ TETRIS.objects = (function() {
             TETRIS.grid.placePiece(this);
         };
 
+        that.isABrotherLocation = function(x,y) {
+            var i = 0,
+                length = brothers.length;
+
+            for (var i = 0; i < length; ++i) {
+                if(x === brothers[i].getXLocation() && y === brothers[i].getYLocation()) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
         that.isABottomPiece = function() {
             var i = 0,
                 length = brothers.length;
@@ -143,7 +155,7 @@ TETRIS.objects = (function() {
                     }
                 }
             }
-    };
+        };
 
         that.isALeftPiece = function() {
             var i = 0,
@@ -526,8 +538,10 @@ TETRIS.objects = (function() {
                 }
 
                 for (i = 0; i < 4; ++i) {
-                    if (pieceAndChanged[i].hasChanged && !(TETRIS.grid.isEmpty(newLocations[i].x, newLocations[i].y))) {
-                        clearToRotate = false;
+                    if (pieceAndChanged[i].hasChanged && !(TETRIS.grid.isEmpty(newLocations[i].x, newLocations[i].y))) {        // If the piece's location has changed and the new location is NOT empty
+                        if(!(pieceAndChanged[i].piece.isABrotherLocation(newLocations[i].x, newLocations[i].y))) {              // If the new location doesn't contain a brother piece
+                            clearToRotate = false;
+                        }
                     }
                 }
 
@@ -622,187 +636,216 @@ TETRIS.objects = (function() {
 
         that.rotate = function(dir) {
             var toState = 0,
-                i = 0,
-                length = 0;
-
-            // Select which state we want to rotate to depending on direction and start state
-            switch(dir) {
-                case 'r':
-                    if(rotationState < 3) {
-                        toState = rotationState + 1;
-                    }
-                    else {
-                        toState = 0;
-                    }
-                    break;
-                case 'l':
-                    if(rotationState > 0) {
-                        toState = rotationState - 1;
-                    }
-                    else {
-                        toState = 3;
-                    }
-                    break;
-            }
+                stateCoordsA = null,
+                stateCoordsB = null,
+                stateCoordsC = null,
+                stateCoordsD = null,
+                useCoords = null;
 
             switch(shape) {
                 case 'B':
                     return; // Box's don't need to rotate
                 case 'LL':
-                    switch(toState) {
-                        case 0:                     // Going to rotation state 0
-                            if(dir == 'r') {        // By rotating right
-                                if(attemptRotation({
-                                    p0 : { x : 0, y : -2 },
-                                    p1 : { x : -1, y : -1 },
-                                    p2 : { x : 0, y : 0 },
-                                    p3 : { x : 1, y : 1 }
-                                })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            else {
-                                if(attemptRotation({
-                                        p0 : { x : -2, y : 0 },
-                                        p1 : { x : -1, y : 1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : 1, y : -1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            break;
-                        case 1:
-                            if(dir == 'r') {
-                                if(attemptRotation({
-                                        p0 : { x : 2, y : 0 },
-                                        p1 : { x : 1, y : -1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : -1, y : 1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            else {
-                                if(attemptRotation({
-                                        p0 : { x : 0, y : -2 },
-                                        p1 : { x : -1, y : -1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : 1, y : 1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            break;
-                        case 2:
-                            if(dir == 'r') {
-                                if(attemptRotation({
-                                        p0 : { x : 0, y : 2 },
-                                        p1 : { x : 1, y : 1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : -1, y : -1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            else {
-                                if(attemptRotation({
-                                        p0 : { x : 2, y : 0 },
-                                        p1 : { x : 1, y : -1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : -1, y : 1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            break;
-                        case 3:
-                            if(dir == 'r') {
-                                if(attemptRotation({
-                                        p0 : { x : -2, y : 0 },
-                                        p1 : { x : -1, y : 1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : 1, y : -1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            else {
-                                if(attemptRotation({
-                                        p0 : { x : 0, y : 2 },
-                                        p1 : { x : 1, y : 1 },
-                                        p2 : { x : 0, y : 0 },
-                                        p3 : { x : -1, y : -1 }
-                                    })) {
-                                    rotationState = toState;
-                                }
-                            }
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : 0, y : -2 },
+                        p1 : { x : -1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : 1 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 2, y : 0 },
+                        p1 : { x : 1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : 1 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : 0, y : 2 },
+                        p1 : { x : 1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : -1 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -2, y : 0 },
+                        p1 : { x : -1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : -1 }
+                    };
                     break;
                 case 'RL':
-                    switch(toState) {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : -1, y : -1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : 1, y : 1 },
+                        p3 : { x : 2, y : 0 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 1, y : -1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : -1, y : 1 },
+                        p3 : { x : 0, y : 2 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : 1, y : 1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : -1, y : -1 },
+                        p3 : { x : -2, y : 0 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -1, y : 1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : 1, y : -1 },
+                        p3 : { x : 0, y : -2 }
+                    };
                     break;
                 case 'LZ':
-                    switch(toState) {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : 0, y : -2 },
+                        p1 : { x : 1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : 1 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 2, y : 0 },
+                        p1 : { x : 1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : 1 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : 0, y : 2 },
+                        p1 : { x : -1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : -1 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -2, y : 0 },
+                        p1 : { x : -1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : -1 }
+                    };
                     break;
                 case 'RZ':
-                    switch(toState) {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : -1, y : -1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : 1, y : -1 },
+                        p3 : { x : 2, y : 0 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 1, y : -1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : 1, y : 1 },
+                        p3 : { x : 0, y : 2 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : 1, y : 1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : -1, y : 1 },
+                        p3 : { x : -2, y : 0 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -1, y : 1 },
+                        p1 : { x : 0, y : 0 },
+                        p2 : { x : -1, y : -1 },
+                        p3 : { x : 0, y : -2 }
+                    };
                     break;
                 case 'T':
-                    switch(toState) {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : 1, y : -1 },
+                        p1 : { x : -1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : 1 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 1, y : 1 },
+                        p1 : { x : 1, y : -1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : 1 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : -1, y : 1 },
+                        p1 : { x : 1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : -1, y : -1 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -1, y : -1 },
+                        p1 : { x : -1, y : 1 },
+                        p2 : { x : 0, y : 0 },
+                        p3 : { x : 1, y : -1 }
+                    };
                     break;
                 case 'I':
-                    switch(toState) {
-                        case 0:
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                    }
+                    stateCoordsA = {
+                        p0 : { x : -1, y : -2 },
+                        p1 : { x : 0, y : -1 },
+                        p2 : { x : 1, y : 0 },
+                        p3 : { x : 2, y : 1 }
+                    };
+                    stateCoordsB = {
+                        p0 : { x : 2, y : -1 },
+                        p1 : { x : 1, y : 0 },
+                        p2 : { x : 0, y : 1 },
+                        p3 : { x : -1, y : 2 }
+                    };
+                    stateCoordsC = {
+                        p0 : { x : 1, y : 2 },
+                        p1 : { x : 0, y : 1 },
+                        p2 : { x : -1, y : 0 },
+                        p3 : { x : -2, y : -1 }
+                    };
+                    stateCoordsD = {
+                        p0 : { x : -2, y : 1 },
+                        p1 : { x : -1, y : 0 },
+                        p2 : { x : 0, y : -1 },
+                        p3 : { x : 1, y : -2 }
+                    };
                     break;
                 default:
                     console.log('Shape is not registered: Rotate');
                     break;
+            }
+
+            if(dir == 'r') {
+                toState = (rotationState < 3) ? rotationState + 1 : 0;
+            }
+            else {
+                toState = (rotationState > 0) ? rotationState - 1 : 3;
+            }
+
+            switch(toState) {
+                case 0:
+                    if(dir == 'r') {
+                        useCoords = stateCoordsA;
+                    } else {
+                        useCoords = stateCoordsD;
+                    }
+                    break;
+                case 1:
+                    if(dir == 'r') {
+                        useCoords = stateCoordsB;
+                    } else {
+                        useCoords = stateCoordsA;
+                    }
+                    break;
+                case 2:
+                    if(dir == 'r') {
+                        useCoords = stateCoordsC;
+                    } else {
+                        useCoords = stateCoordsB;
+                    }
+                    break;
+                case 3:
+                    if(dir == 'r') {
+                        useCoords = stateCoordsD;
+                    } else {
+                        useCoords = stateCoordsC;
+                    }
+                    break;
+            }
+
+            if(attemptRotation(useCoords)) {            // This actually performs the rotation
+                rotationState = toState;
             }
         };
 
@@ -882,57 +925,6 @@ TETRIS.objects = (function() {
 
         return that;
     }
-
-    // 'B'
-    //  _________
-    //  | 1 | 2 |
-    //  _________
-    //  | 3 | 4 |
-    //  _________
-
-    // 'LL'
-    //      _____
-    //      | 1 |
-    //      _____
-    //      | 2 |
-    //  _________
-    //  | 4 | 3 |
-    //  _________
-
-    // 'RL'
-    //  _____
-    //  | 1 |
-    //  _____
-    //  | 2 |
-    //  _________
-    //  | 3 | 4 |
-    //  _________
-
-    // 'LZ'
-    //  _________
-    //  | 1 | 2 |
-    //  ______________
-    //      | 3 |  4 |
-    //      __________
-
-    // 'RZ'
-    //      _________
-    //      | 3 | 4 |
-    //  _____________
-    //  | 1 | 2 |
-    //  _________
-
-    // 'T'
-    //  _____________
-    //  | 1 | 2 | 3 |
-    //  _____________
-    //      | 4 |
-    //      _____
-
-    // 'I'
-    //  _________________
-    //  | 1 | 2 | 3 | 4 |
-    //  _________________
 
     return {
         Piece : Piece,
