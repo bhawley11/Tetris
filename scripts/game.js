@@ -23,7 +23,10 @@ TETRIS.screens['game'] = (function() {
         TETRIS.nextShape = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
-            TETRIS.grid.clearGrid();
+            TETRIS.onGameScreen = false;
+            if(TETRIS.grid != null){
+                TETRIS.grid.clearGrid();
+            }
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
         });
@@ -111,6 +114,7 @@ TETRIS.screens['game'] = (function() {
 
     function run() {
         gameOver = false;
+        TETRIS.onGameScreen = true;
         if(TETRIS.sessionID != null) {
             cancelAnimationFrame(TETRIS.sessionID);
             TETRIS.sessionID = null;
