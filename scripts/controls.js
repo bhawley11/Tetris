@@ -62,43 +62,37 @@ TETRIS.screens['controls'] = (function() {
 
         if(id === 'left-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[0].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].moveLeft();});
+            TETRIS.keyboard.unregisterCommand(arrayID[0].value,newKeyCode);
             arrayID[0].value = newKeyCode;
             arrayID[0].key = newKeyChar;
         }
         else if(id === 'right-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[1].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].moveRight();});
+            TETRIS.keyboard.unregisterCommand(arrayID[1].value, newKeyCode);
             arrayID[1].value = newKeyCode;
             arrayID[1].key = newKeyChar;
         }
         else if(id === 'soft-drop-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[4].value);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].softDrop();});
+            TETRIS.keyboard.unregisterCommand(arrayID[4].value, newKeyCode);
             arrayID[4].value = newKeyCode;
             arrayID[4].key = newKeyChar;
         }
         else if(id === 'hard-drop-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[5]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].hardDrop();});
+            TETRIS.keyboard.unregisterCommand(arrayID[5].value, newKeyCode);
             arrayID[5].value = newKeyCode;
             arrayID[5].key = newKeyChar;
         }
         else if(id === 'left-rotate-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[2]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function(){TETRIS.screens['game'].rotateLeft();});
+            TETRIS.keyboard.unregisterCommand(arrayID[2].value, newKeyCode);
             arrayID[2].value = newKeyCode;
             arrayID[2].key = newKeyChar;
         }
         else if(id === 'right-rotate-control')
         {
-            TETRIS.keyboard.unregisterCommand(arrayID[3]);
-            TETRIS.keyboard.registerCommand(newKeyCode, function() {TETRIS.screens['game'].rotateRight();});
+            TETRIS.keyboard.unregisterCommand(arrayID[3].value, newKeyCode);
             arrayID[3].value = newKeyCode;
             arrayID[3].key = newKeyChar;
         }

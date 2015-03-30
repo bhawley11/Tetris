@@ -61,13 +61,15 @@ TETRIS.input = (function(){
             });
         };
 
-        that.unregisterCommand = function(keyCode){
+        that.unregisterCommand = function(keyCode, newKeyCode){
             var i = 0;
             for(i; i < that.handlers.length; i++)
             {
                 if(that.handlers[i].key === keyCode)
                 {
-                    that.handlers.splice(i,1);
+                    that.handlers[i].key = newKeyCode;
+                    that.handlers[i].lastFired = 0;
+                    that.handlers[i].wasHeld = false;
                 }
             }
         };
