@@ -41,7 +41,9 @@ TETRIS.objects = (function() {
             isTop = true,
 
             pieceImage = null,
-            location = { x : 0, y : 0};
+            location = { x : 0, y : 0},
+
+            fatherShape = null;
 
         that.addBrothers = function(piece1, piece2, piece3) {
             brothers.push(piece1);
@@ -79,6 +81,10 @@ TETRIS.objects = (function() {
             return brothers;
         };
 
+        that.getFatherShape = function() {
+            return fatherShape;
+        };
+
         that.getIsBottom = function() {
             return isBottom;
         };
@@ -107,7 +113,7 @@ TETRIS.objects = (function() {
             that.setPieceKnowledge();
         };
 
-        that.init = function(coords, image) {
+        that.init = function(coords, image, father) {
             location.x = coords.x;
             location.y = coords.y;
             pieceImage = image;
@@ -120,6 +126,8 @@ TETRIS.objects = (function() {
 
             brothers.length = 0;
             bottoms.length = 0;
+
+            fatherShape = father;
 
             TETRIS.grid.placePiece(this);
         };
@@ -291,6 +299,24 @@ TETRIS.objects = (function() {
                 }
                 return false;
             };
+
+        that.checkForFullRows = function() {
+            var rowNum = 21,
+                colNum = 0,
+                isFull = false,
+                listOfFullRows = {};
+
+            for(rowNum = 21; rowNum >= 0; rowNum--) {
+                isFull = false;
+
+                for(colNum = 0; colNum <= 10; colNum++) {
+                    if(grid.isEmpty(rowNum, colNum)) {          // This row contains an empty cell;
+                        isFull = false;
+                        break;
+                    }
+                }
+            }
+        };
 
         that.clearGrid = function() {
             that.init();
@@ -476,8 +502,8 @@ TETRIS.objects = (function() {
 
                 currentPiece.hasChanged();
 
-                console.log('Piece ' + i);
-                currentPiece.printDetails();
+                //console.log('Piece ' + i);
+                //currentPiece.printDetails();
             }
         };
 
@@ -862,46 +888,46 @@ TETRIS.objects = (function() {
 
             switch(shape) {
                 case 'B':
-                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/green_square.png']);
-                    pieces[1].init({ x : 5, y : 0 }, TETRIS.images['images/squares/green_square.png']);
-                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/green_square.png']);
-                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/green_square.png']);
+                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/green_square.png'], this);
+                    pieces[1].init({ x : 5, y : 0 }, TETRIS.images['images/squares/green_square.png'], this);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/green_square.png'], this);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/green_square.png'], this);
                     break;
                 case 'LL':
-                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
-                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/blue_square.png']);
+                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/blue_square.png'], this);
+                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/blue_square.png'], this);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/blue_square.png'], this);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/blue_square.png'], this);
                     break;
                 case 'RL':
-                    pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
-                    pieces[1].init({ x : 4, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
-                    pieces[2].init({ x : 5, y : 1 }, TETRIS.images['images/squares/light_blue_square.png']);
-                    pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/light_blue_square.png']);
+                    pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/light_blue_square.png'], this);
+                    pieces[1].init({ x : 4, y : 1 }, TETRIS.images['images/squares/light_blue_square.png'], this);
+                    pieces[2].init({ x : 5, y : 1 }, TETRIS.images['images/squares/light_blue_square.png'], this);
+                    pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/light_blue_square.png'], this);
                     break;
                 case 'LZ':
-                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
-                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/orange_square.png']);
+                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/orange_square.png'], this);
+                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/orange_square.png'], this);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/orange_square.png'], this);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/orange_square.png'], this);
                     break;
                 case 'RZ':
-                    pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/gray_square.png']);
-                    pieces[1].init({ x : 4, y : 1 }, TETRIS.images['images/squares/gray_square.png']);
-                    pieces[2].init({ x : 4, y : 0 }, TETRIS.images['images/squares/gray_square.png']);
-                    pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/gray_square.png']);
+                    pieces[0].init({ x : 3, y : 1 }, TETRIS.images['images/squares/gray_square.png'], this);
+                    pieces[1].init({ x : 4, y : 1 }, TETRIS.images['images/squares/gray_square.png'], this);
+                    pieces[2].init({ x : 4, y : 0 }, TETRIS.images['images/squares/gray_square.png'], this);
+                    pieces[3].init({ x : 5, y : 0 }, TETRIS.images['images/squares/gray_square.png'], this);
                     break;
                 case 'T':
-                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
-                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/brown_square.png']);
+                    pieces[0].init({ x : 4, y : 0 }, TETRIS.images['images/squares/brown_square.png'], this);
+                    pieces[1].init({ x : 3, y : 1 }, TETRIS.images['images/squares/brown_square.png'], this);
+                    pieces[2].init({ x : 4, y : 1 }, TETRIS.images['images/squares/brown_square.png'], this);
+                    pieces[3].init({ x : 5, y : 1 }, TETRIS.images['images/squares/brown_square.png'], this);
                     break;
                 case 'I':
-                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/navy_square.png']);
-                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/navy_square.png']);
-                    pieces[2].init({ x : 5, y : 0 }, TETRIS.images['images/squares/navy_square.png']);
-                    pieces[3].init({ x : 6, y : 0 }, TETRIS.images['images/squares/navy_square.png']);
+                    pieces[0].init({ x : 3, y : 0 }, TETRIS.images['images/squares/navy_square.png'], this);
+                    pieces[1].init({ x : 4, y : 0 }, TETRIS.images['images/squares/navy_square.png'], this);
+                    pieces[2].init({ x : 5, y : 0 }, TETRIS.images['images/squares/navy_square.png'], this);
+                    pieces[3].init({ x : 6, y : 0 }, TETRIS.images['images/squares/navy_square.png'], this);
                     break;
                 default:
                     console.log('Shape is not registered: Spawn');
@@ -916,11 +942,6 @@ TETRIS.objects = (function() {
             pieces[1].setPieceKnowledge();
             pieces[2].setPieceKnowledge();
             pieces[3].setPieceKnowledge();
-
-            pieces[0].printDetails();
-            pieces[1].printDetails();
-            pieces[2].printDetails();
-            pieces[3].printDetails();
         };
 
         return that;

@@ -53,6 +53,14 @@ window.addEventListener('load', function() {
                 'preload!images/squares/navy_square.png',
                 'preload!images/squares/orange_square.png',
 
+                'preload!images/shapes/BShape.png',
+                'preload!images/shapes/IShape.png',
+                'preload!images/shapes/LLShape.png',
+                'preload!images/shapes/LZShape.png',
+                'preload!images/shapes/RLShape.png',
+                'preload!images/shapes/RZShape.png',
+                'preload!images/shapes/TShape.png',
+
                 /* SCRIPTS */
                 'preload!scripts/objects.js',
                 'preload!scripts/random.js',
