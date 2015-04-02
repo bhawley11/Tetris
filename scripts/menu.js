@@ -25,7 +25,7 @@ TETRIS.screens['menu'] = (function() {
 
     function run() {
         if(TETRIS.menuMusic === undefined || TETRIS.menuMusic.paused) {
-            TETRIS.menuMusic = new Audio('/Tetris/sounds/music/title_theme.mp3');
+            TETRIS.menuMusic = new Audio('/sounds/music/title_theme.mp3');
             TETRIS.menuMusic.addEventListener('ended', function () {
                 TETRIS.menuMusic.currentTime = 0;
                 TETRIS.menuMusic.play();
