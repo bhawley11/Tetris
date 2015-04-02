@@ -39,6 +39,7 @@ TETRIS.objects = (function() {
             isLeft = true,
             isRight = true,
             isTop = true,
+            isDeleted = false,
 
             pieceImage = null,
             location = { x : 0, y : 0},
@@ -63,6 +64,8 @@ TETRIS.objects = (function() {
                 brothers[i].removeBrother(this);
                 brothers[i].setPieceKnowledge();
             }
+
+            isDeleted = true;
         };
 
         that.draw = function(x,y) {
@@ -224,6 +227,10 @@ TETRIS.objects = (function() {
             }
         };
 
+        that.isDeleted = function() {
+            return isDeleted;
+        };
+
         that.openBelow = function() {
             return (TETRIS.grid.isEmpty(location.x, location.y + 1));
         };
@@ -301,25 +308,72 @@ TETRIS.objects = (function() {
             };
 
         that.checkForFullRows = function() {
-            var rowNum = 21,
-                colNum = 0,
-                isFull = false,
-                listOfFullRows = {};
+            var y = 21,
+                x = 0,
+                isFull = true,
+                allEmpty = false,
+                rowDeleted = false,
+                listOfRowIndex = [];
 
-            for(rowNum = 21; rowNum >= 0; rowNum--) {
-                isFull = false;
+            for(y = 21; y >= 0; y--) {
+                isFull = true;
+                allEmpty = false;
 
-                for(colNum = 0; colNum <= 10; colNum++) {
-                    if(grid.isEmpty(rowNum, colNum)) {          // This row contains an empty cell;
-                        isFull = false;
-                        break;
+                for(x = 0; x < 10; x++) {
+                    if(TETRIS.grid.isEmpty(x, y)) {             // This row contains an empty cell, we don't care about it anymore
+                        isFull = false;                         // If this row has an empty spot, it is not full
+                    }
+                    else {
+                        allEmpty = false;                       // If this row has a single piece in it, it is not all empty
                     }
                 }
+
+                if(allEmpty) {                                  // If all columns are empty in the row then there will be nothing above, just stop there
+                    break;
+                }
+
+                if(isFull) {                                    // If the row if full, I need to work on it.
+                    listOfRowIndex.push(y);                     // I want to push the index of the row to change
+                }
+            }
+            if(listOfRowIndex.length > 0) {
+                TETRIS.grid.deleteRows(listOfRowIndex);
             }
         };
 
         that.clearGrid = function() {
             that.init();
+        };
+
+        that.deleteRows = function(listOfFullIndex) {
+            var lengthOfList = listOfFullIndex.length,
+                index = 0,
+                x = 0,
+                y = 0,
+                row = null,
+                currentShape = null,
+                pieces = null,
+                piece = null,
+                pIndex = 0;
+
+            console.log(listOfFullIndex.length);
+
+            for(index = 0; index < lengthOfList; ++index) {         // For each index in the list, we need the y out of it
+                y = listOfFullIndex[index];                         // Get the y coord of the row we are working on
+
+                for(x = 0; x < 10; ++x) {
+
+                    currentShape = grid[x][y].getFatherShape();     // Get the shape this piece belongs to
+                    grid[x][y].deletePiece();                       // Delete the piece (marks it as deleted and removes it from all of its brothers lists of brother pieces
+                    pieces = currentShape.getPieces();              // Get all of the pieces of the shape
+
+                    for(pIndex = 0; pIndex < 4; ++pIndex) {
+                        pieces[pIndex].setPieceKnowledge();         // Reset the piece knowledge of the remaining pieces
+                    }
+                }
+            }
+
+            TETRIS.grid.makeGridFall();                              // Now we need to move all pieces down to fill in the empty space
         };
 
         that.draw = function() {
@@ -330,7 +384,7 @@ TETRIS.objects = (function() {
 
             for(i = 0; i < columns; ++i) {
                 for(j = 2; j < rows; ++j) {
-                    if(grid[i][j] !== null) {
+                    if(grid[i][j] !== null && !(grid[i][j].isDeleted())) {
                         grid[i][j].draw(i, j);
                     }
                 }
@@ -353,17 +407,40 @@ TETRIS.objects = (function() {
 
         that.isEmpty = function(x, y) {
             if(withinBounds(x, y)) {
-                if(grid[x][y] === null) {
+                if(grid[x][y] === null || grid[x][y].isDeleted()) {
                     return true;
                 }
             }
             return false;
         };
 
+        that.makeGridFall = function() {
+            var y = 21,
+                x = 0,
+                i = 0,
+                currentShape = null,
+                pieces = null;
+
+            for(y = 21; y >= 0; --y) {
+                for(x = 0; x < 10; ++x) {
+                    if(!TETRIS.grid.isEmpty(x,y)) {                         // If there is a piece in this cell, try to move it down
+                        currentShape = grid[x][y].getFatherShape();
+
+                        pieces = currentShape.getPieces();
+                        for(i = 0; i < 4; ++i) {
+                            while(TETRIS.grid.movePieceDown(pieces[i])) {}   // Move piece down until it can't go any further
+                        }
+
+                    }
+                }
+            }
+        };
+
         that.movePieceDown = function(piece) {
             var allClear = true,
                 brothers = piece.getBrothers(),
                 currentPiece = null,
+                pieceMoved = false,
                 length = 0,
                 i = 0,
                 x = 0,
@@ -387,9 +464,11 @@ TETRIS.objects = (function() {
                         grid[x][y] = null;
                         grid[x][y + 1] = currentPiece;
                         currentPiece.setYLocation(y + 1);
+                        pieceMoved = true;
                     }
                 }
             }
+            return pieceMoved;
         };
 
         that.moveShapeDown = function(shape) {
