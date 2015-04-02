@@ -21,6 +21,7 @@ TETRIS.screens['game'] = (function() {
         TETRIS.grid.init();
         TETRIS.currentShape = null;
         TETRIS.nextShape = null;
+        TETRIS.nextShapeImage = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             TETRIS.onGameScreen = false;
@@ -53,25 +54,60 @@ TETRIS.screens['game'] = (function() {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
-        if(ticTime/1000 > .75) {
-            if(!TETRIS.currentShape.fall()){
-                TETRIS.currentShape = TETRIS.nextShape;
-                if (TETRIS.currentShape.canSpawn()) {
-                    TETRIS.currentShape.spawn();
-                }
-                else{
-                    gameOver = true;
-                }
-                TETRIS.nextShape = TETRIS.objects.Shape(nextShape());
-            }
-            ticTime= 0;
-        }
-            update();
-            render();
+
+        update();
+        render();
 
         TETRIS.particleSystem.update(TETRIS.elapsedTime);
         if (!cancelNextRequest) {
             TETRIS.sessionID = requestAnimationFrame(gameLoop);
+        }
+    }
+
+    function getNextShapeDetails(shape) {
+        switch(shape) {
+            case 'B':
+                return {
+                    image : TETRIS.images['images/shapes/BShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 70, height : 70
+                };
+            case 'LL':
+                return {
+                    image : TETRIS.images['images/shapes/LLShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 105, height : 70
+                };
+            case 'RL':
+                return {
+                    image : TETRIS.images['images/shapes/RLShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 105, height : 70
+                };
+            case 'LZ':
+                return {
+                    image : TETRIS.images['images/shapes/LZShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 105, height : 70
+                };
+            case 'RZ':
+                return {
+                    image : TETRIS.images['images/shapes/RZShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 105, height : 70
+                };
+            case 'T':
+                return {
+                    image : TETRIS.images['images/shapes/TShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 105, height : 70
+                };
+            case 'I':
+                return {
+                    image : TETRIS.images['images/shapes/IShape.png'],
+                    center : { x : 700, y : 200 },
+                    width : 140, height : 35
+                };
         }
     }
 
@@ -81,6 +117,9 @@ TETRIS.screens['game'] = (function() {
         scoreBoard.draw();
         theHog.draw();
         TETRIS.grid.draw();
+        if (TETRIS.nextShapeImage !== null) {
+            TETRIS.nextShapeImage.draw();
+        }
     }
 
     function nextShape(){
@@ -113,69 +152,104 @@ TETRIS.screens['game'] = (function() {
     }
 
     function run() {
-        TETRIS.keyboard.clearKeyboardState();
+        var abbrevForNextShape,
+            nextShapeSpec;
+
         gameOver = false;
         TETRIS.onGameScreen = true;
+        cancelNextRequest = false;
+
+        TETRIS.menuMusic.pause();
+        TETRIS.lastTime = performance.now();
+
+        TETRIS.keyboard.clearKeyboardState();
+
         if(TETRIS.sessionID != null) {
             cancelAnimationFrame(TETRIS.sessionID);
             TETRIS.sessionID = null;
         }
 
-        for(var i = 0; i < 4; i++)
-        {
+        for(var i = 0; i < 4; i++) {
             shapeHistory.push('LZ');
         }
 
         TETRIS.currentShape = TETRIS.objects.Shape(nextShape());
+
         if(TETRIS.currentShape.canSpawn()) {
             TETRIS.currentShape.spawn();
         }
-        TETRIS.nextShape = TETRIS.objects.Shape(nextShape());
 
-        TETRIS.menuMusic.pause();
-        TETRIS.lastTime = performance.now();
+        abbrevForNextShape = nextShape();
+        TETRIS.nextShape = TETRIS.objects.Shape(abbrevForNextShape);
 
-        cancelNextRequest = false;
+        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+        TETRIS.nextShapeImage = TETRIS.graphics.Texture({
+            image : nextShapeSpec.image,
+            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
+            width : nextShapeSpec.width, height : nextShapeSpec.height
+        });
+
         TETRIS.sessionID = requestAnimationFrame(gameLoop);
     }
 
     function update() {
+        var abbrevForNextShape,
+            nextShapeSpec;
+
         if(gameOver){
 
         }
         else{
+            if(ticTime/1000 > .75) {
+                if(!TETRIS.currentShape.fall()){            // Goes in when shape is locked in place
+                    TETRIS.currentShape = TETRIS.nextShape;
+
+                    if (TETRIS.currentShape.canSpawn()) {
+                        TETRIS.currentShape.spawn();
+                    }
+                    else{
+                        gameOver = true;
+                    }
+
+                    abbrevForNextShape = nextShape();
+                    TETRIS.nextShape = TETRIS.objects.Shape(abbrevForNextShape);
+                    nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+
+                    TETRIS.nextShapeImage = TETRIS.graphics.Texture({
+                        image : nextShapeSpec.image,
+                        center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
+                        width : nextShapeSpec.width, height : nextShapeSpec.height
+                    });
+                }
+                ticTime= 0;
+            }
+
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
 
     }
 
     function rotateLeft(){
-        console.log("Rotating Left");
         TETRIS.currentShape.rotate('l');
     }
 
     function rotateRight(){
-        console.log("Rotating Right");
         TETRIS.currentShape.rotate('r');
     }
 
     function moveLeft(){
-        console.log("Moving Left");
         TETRIS.currentShape.moveLeft();
     }
 
     function moveRight(){
-        console.log("Moving Right");
         TETRIS.currentShape.moveRight();
     }
 
     function hardDrop(){
-        console.log("Hard Dropping");
         TETRIS.currentShape.hardDrop();
     }
 
     function softDrop(){
-        console.log("Soft Dropping");
         TETRIS.currentShape.fall();
     }
 
