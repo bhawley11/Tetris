@@ -1,11 +1,12 @@
 /**
  * Created by Shaun on 4/2/2015.
  */
-
 var express = require('express'),
     http = require('http'),
     path = require('path'),
+    scores = require('./scripts/scores'),
     app = express();
+
 
 app.set('port',process.env.PORT || 3000);
 app.engine('html',require('ejs').renderFile);
@@ -23,6 +24,14 @@ app.use('/images', express.static(__dirname + '/images'));
 
 app.get('/', function(request, response){
     response.render('index.html');
+});
+
+app.get('/v1/high-scores', scores.all);
+app.post('/v1/high-scores', scores.add);
+
+app.all('/v1/*', function(request, response){
+    response.writeHead(501);
+    response.end();
 });
 
 http.createServer(app).listen(app.get('port'), function(){
