@@ -12,7 +12,8 @@ TETRIS.screens['game'] = (function() {
         ticTime = 0,
         shapeHistory = [],
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
-        gameOver = false;
+        gameOver = false,
+        score = 0;
 
     function init() {
         console.log('Tetris initializing...');
@@ -155,6 +156,8 @@ TETRIS.screens['game'] = (function() {
         var abbrevForNextShape,
             nextShapeSpec;
 
+        score = 0;
+
         gameOver = false;
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
@@ -197,10 +200,18 @@ TETRIS.screens['game'] = (function() {
             nextShapeSpec;
 
         if(gameOver){
-
+            var name = prompt("Please enter your name", "");
+            TETRIS.screens['highScores'].addScore(name, score);
+            TETRIS.onGameScreen = false;
+            if(TETRIS.grid != null){
+                TETRIS.grid.clearGrid();
+            }
+            cancelNextRequest = true;
+            TETRIS.main.showScreen('menu');
         }
         else{
             if(ticTime/1000 > .75) {
+                score += 100;
                 if(!TETRIS.currentShape.fall()){            // Goes in when shape is locked in place
                     TETRIS.grid.checkForFullRows();
 
