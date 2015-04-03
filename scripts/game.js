@@ -202,6 +202,8 @@ TETRIS.screens['game'] = (function() {
         else{
             if(ticTime/1000 > .75) {
                 if(!TETRIS.currentShape.fall()){            // Goes in when shape is locked in place
+                    TETRIS.grid.checkForFullRows();
+
                     TETRIS.currentShape = TETRIS.nextShape;
 
                     if (TETRIS.currentShape.canSpawn()) {
