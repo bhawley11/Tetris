@@ -23,7 +23,7 @@ TETRIS.screens['highScores'] = (function() {
                     text;
 
                 list.empty();
-                for(value = 0; value < 5; value++){
+                for(value = 0; value < 10; value++){
                     text = (data[value].name + ' : ' + data[value].score);
                     list.append($('<li>', {text:text}));
                 }
