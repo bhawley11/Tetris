@@ -51,11 +51,12 @@ exports.add = function(request, response) {
         newScore = request.query.score,
         appendString = '-' + newName + '/' + newScore;
 
-    fs.appendFile('score.txt', appendString,function(err){
-        if(err){
-            console.log("Error Writing to File!");
-        }
-    });
+        fs.appendFile('score.txt', appendString, function (err) {
+            if (err) {
+                console.log("Error Writing to File!");
+            }
+        });
+
 
     var now = new Date();
     scores.push( {
