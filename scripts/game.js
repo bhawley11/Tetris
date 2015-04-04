@@ -6,23 +6,25 @@ TETRIS.screens['game'] = (function() {
     'use strict';
 
     var cancelNextRequest = false,
+        gameOver = false,
+
+        currentShape = null,
+        shapeOnDeck = null,
+        shapeOnDeckImage = null,
         gameBoard = null,
+
+        playScreen = null,
         scoreBoard = null,
         theHog = null,
+
         ticTime = 0,
         shapeHistory = [],
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
-        gameOver = false,
+    
         score = 0;
 
     function init() {
         console.log('Tetris initializing...');
-
-        TETRIS.grid = TETRIS.objects.Grid();
-        TETRIS.grid.init();
-        TETRIS.currentShape = null;
-        TETRIS.nextShape = null;
-        TETRIS.nextShapeImage = null;
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             TETRIS.onGameScreen = false;
@@ -33,7 +35,7 @@ TETRIS.screens['game'] = (function() {
             TETRIS.main.showScreen('menu');
         });
 
-        gameBoard = TETRIS.graphics.GameBoard({
+        playScreen = TETRIS.graphics.GameBoard({
             pieceBackgroundImage : 'images/backgrounds/fud.jpg'
         });
 
@@ -114,12 +116,14 @@ TETRIS.screens['game'] = (function() {
 
     function render() {
         TETRIS.graphics.clear();
-        gameBoard.draw();
+        playScreen.draw();
         scoreBoard.draw();
         theHog.draw();
-        TETRIS.grid.draw();
-        if (TETRIS.nextShapeImage !== null) {
-            TETRIS.nextShapeImage.draw();
+
+        TETRIS.graphics.drawGrid(gameBoard.getGrid());
+
+        if (shapeOnDeckImage !== null) {
+            shapeOnDeckImage.draw();
         }
     }
 
@@ -176,17 +180,19 @@ TETRIS.screens['game'] = (function() {
             shapeHistory.push('LZ');
         }
 
-        TETRIS.currentShape = TETRIS.objects.Shape(nextShape());
+        gameBoard = TETRIS.objects.GameBoard();
+        gameBoard.createGameBoard();
 
-        if(TETRIS.currentShape.canSpawn()) {
-            TETRIS.currentShape.spawn();
-        }
+        currentShape =  TETRIS.objects.Shape();
+        currentShape.createShape(nextShape());
+        currentShape.spawn(gameBoard);
 
         abbrevForNextShape = nextShape();
-        TETRIS.nextShape = TETRIS.objects.Shape(abbrevForNextShape);
+        shapeOnDeck = TETRIS.objects.Shape();
+        shapeOnDeck.createShape(abbrevForNextShape);
 
         nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
-        TETRIS.nextShapeImage = TETRIS.graphics.Texture({
+        shapeOnDeckImage = TETRIS.graphics.Texture({
             image : nextShapeSpec.image,
             center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
             width : nextShapeSpec.width, height : nextShapeSpec.height
@@ -211,28 +217,29 @@ TETRIS.screens['game'] = (function() {
         }
         else{
             if(ticTime/1000 > .75) {
-                score += 100;
-                if(!TETRIS.currentShape.fall()){            // Goes in when shape is locked in place
-                    TETRIS.grid.checkForFullRows();
+                if(!currentShape.softDrop(gameBoard)){
+                    gameBoard.checkForCompleteLines();
 
-                    TETRIS.currentShape = TETRIS.nextShape;
+                    currentShape = TETRIS.objects.Shape();
+                    currentShape.createShape(shapeOnDeck.getShapeAbbrev());
 
-                    if (TETRIS.currentShape.canSpawn()) {
-                        TETRIS.currentShape.spawn();
-                    }
-                    else{
+                    if(currentShape.checkSpawnLocation(gameBoard)) {
+                        // Next Shape
+                        abbrevForNextShape = nextShape();
+                        shapeOnDeck = TETRIS.objects.Shape();
+                        shapeOnDeck.createShape(abbrevForNextShape);
+
+                        // Next Shape Image
+                        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+                        shapeOnDeckImage = TETRIS.graphics.Texture({
+                            image : nextShapeSpec.image,
+                            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
+                            width : nextShapeSpec.width, height : nextShapeSpec.height
+                        });
+
+                    } else {
                         gameOver = true;
                     }
-
-                    abbrevForNextShape = nextShape();
-                    TETRIS.nextShape = TETRIS.objects.Shape(abbrevForNextShape);
-                    nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
-
-                    TETRIS.nextShapeImage = TETRIS.graphics.Texture({
-                        image : nextShapeSpec.image,
-                        center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
-                        width : nextShapeSpec.width, height : nextShapeSpec.height
-                    });
                 }
                 ticTime= 0;
             }
@@ -243,27 +250,27 @@ TETRIS.screens['game'] = (function() {
     }
 
     function rotateLeft(){
-        TETRIS.currentShape.rotate('l');
+        currentShape.rotate(gameBoard, 'l');
     }
 
     function rotateRight(){
-        TETRIS.currentShape.rotate('r');
+        currentShape.rotate(gameBoard, 'r');
     }
 
     function moveLeft(){
-        TETRIS.currentShape.moveLeft();
+        currentShape.moveLeft(gameBoard);
     }
 
     function moveRight(){
-        TETRIS.currentShape.moveRight();
+        currentShape.moveRight(gameBoard);
     }
 
     function hardDrop(){
-        TETRIS.currentShape.hardDrop();
+        currentShape.hardDrop(gameBoard);
     }
 
     function softDrop(){
-        TETRIS.currentShape.fall();
+        currentShape.softDrop(gameBoard);
     }
 
     return {

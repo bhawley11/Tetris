@@ -272,11 +272,32 @@ TETRIS.graphics = (function() {
         ctx.restore();
     }
 
+
+    function drawGrid(gameGrid) {
+        var i = 0,
+            j = 0,
+            rows = 22,
+            columns = 10;
+
+        for(i = 0; i < columns; ++i) {
+            for(j = 2; j < rows; ++j) {
+                if(gameGrid[i][j] !== null) {
+                    Texture({
+                        image : gameGrid[i][j].getImage(),
+                        center : { x : 35 * i + 17.5 + 75, y : 35 * j + 67.5 - 70 /* -70 because of the invisible top two rows */ },
+                        width : 35, height : 35
+                    }).draw();
+                }
+            }
+        }
+    }
+
     return {
         GameBoard : GameBoard,
         StatScreen : StatScreen,
         Texture : Texture,
         drawParticles : drawParticles,
+        drawGrid : drawGrid,
         clear : clear
     }
 }());
