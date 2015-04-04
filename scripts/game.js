@@ -19,7 +19,9 @@ TETRIS.screens['game'] = (function() {
 
         ticTime = 0,
         shapeHistory = [],
-        listOfShapes = ['B','LL','RL','LZ','RZ','T','I'];
+        listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
+    
+        score = 0;
 
     function init() {
         console.log('Tetris initializing...');
@@ -158,6 +160,8 @@ TETRIS.screens['game'] = (function() {
         var abbrevForNextShape,
             nextShapeSpec;
 
+        score = 0;
+
         gameOver = false;
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
@@ -202,7 +206,14 @@ TETRIS.screens['game'] = (function() {
             nextShapeSpec;
 
         if(gameOver){
-
+            var name = prompt("Please enter your name", "");
+            TETRIS.screens['highScores'].addScore(name, score);
+            TETRIS.onGameScreen = false;
+            if(TETRIS.grid != null){
+                TETRIS.grid.clearGrid();
+            }
+            cancelNextRequest = true;
+            TETRIS.main.showScreen('menu');
         }
         else{
             if(ticTime/1000 > .75) {
@@ -232,6 +243,7 @@ TETRIS.screens['game'] = (function() {
                 }
                 ticTime= 0;
             }
+
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
 
