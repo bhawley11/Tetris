@@ -19,8 +19,6 @@ TETRIS.particleSystem = (function() {
                     x = 75 + (j * 35 + 17.5);
                     y = ((ids[i] - 2) * 35) + 17.5 + 50;
 
-                    console.log('x: ' + ids[i] + " y: " + j);
-
                     for (k; k < 4; k++) {
                         createParticles(x, y, theGrid[j][ids[i]].getImage());
                     }
