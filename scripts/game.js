@@ -9,7 +9,6 @@ TETRIS.screens['game'] = (function() {
         gameOver = false,
 
         currentShape = null,
-        shapeOnDeck = null,
         shapeOnDeckImage = null,
         gameBoard = null,
 
@@ -215,9 +214,7 @@ TETRIS.screens['game'] = (function() {
 
             TETRIS.screens['highScores'].addScore(name, parseInt(score));
             TETRIS.onGameScreen = false;
-            if(TETRIS.grid != null){
-                TETRIS.grid.clearGrid();
-            }
+
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
         }
