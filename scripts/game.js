@@ -22,6 +22,7 @@ TETRIS.screens['game'] = (function() {
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
     
         score = 0,
+        multiplier,
         speed,
         linesCleared,
         linesToNextDiff = 0,
@@ -164,6 +165,7 @@ TETRIS.screens['game'] = (function() {
         var abbrevForNextShape,
             nextShapeSpec;
 
+        multiplier = 1;
         score = 0;
         speed = .75;
         linesCleared = 0;
@@ -213,7 +215,8 @@ TETRIS.screens['game'] = (function() {
 
         if(gameOver){
             var name = prompt("Please enter your name", "");
-            TETRIS.screens['highScores'].addScore(name, score);
+
+            TETRIS.screens['highScores'].addScore(name, parseInt(score));
             TETRIS.onGameScreen = false;
             if(TETRIS.grid != null){
                 TETRIS.grid.clearGrid();
@@ -229,11 +232,15 @@ TETRIS.screens['game'] = (function() {
                     if(particleStartIndexes.length > 0) {
                         gameBoard.deleteLines(particleStartIndexes);
                     }
+                    if(particleStartIndexes != 0){
+                        score += 100 * particleStartIndexes * multiplier;
+                    }
                     linesCleared += particleStartIndexes.length;
                     linesToNextDiff += particleStartIndexes.length;
 
                     if(linesToNextDiff >= 10){
                         speed = speed - .10;
+                        multiplier += 1;
                         if(speed < 0){
                             speed = .10;
                         }
