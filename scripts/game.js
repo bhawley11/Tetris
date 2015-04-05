@@ -226,7 +226,7 @@ TETRIS.screens['game'] = (function() {
                    do {
                         particleStartIndexes = gameBoard.checkForCompleteLines();
                         beginEffect(particleStartIndexes,gameBoard);
-                        gameBoard.deleteLines(particleStartIndexes);
+                        gameBoard.deleteLines(particleStartIndexes, gameBoard);
                         gameBoard.fillIn(gameBoard);
 
                        if(particleStartIndexes != 0){

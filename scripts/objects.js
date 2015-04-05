@@ -115,11 +115,21 @@ TETRIS.objects = function () {
 
 
         that.createShapeFromPieces = function (ps) {
-            var amtOfPieces = pieces.length,
+            var amtOfPieces = ps.length,
+                currentPiece = null,
+                father = this,
+                image = ps[0].getImage(),
+                location = null,
                 i = 0;
 
+            spawned = true;
+
             for (i = 0; i < amtOfPieces; ++i) {
-                pieces.push(ps[i]);
+                currentPiece = Piece();
+
+                location = ps[i].getLocation();
+                currentPiece.createPiece(location, image, father);
+                pieces.push(currentPiece);
             }
 
             that.setUpShapeBoundaries();
@@ -483,6 +493,52 @@ TETRIS.objects = function () {
         };
 
 
+        that.splitShape = function (gameBoard) {
+            var currentPiece = null,
+                currentShape = this,
+                shape1 = null,
+                shape2 = null,
+                subShape1 = [],
+                subShape2 = [],
+                switchSubs = 1,
+                i = 1,
+                j = 0;
+
+            subShape1.push(pieces[0]);
+
+            for(i = 1; i < pieces.length; ++i) {
+                currentPiece = pieces[i];
+
+                if(switchSubs === 1) {
+                    if (Math.abs(currentPiece.getLocation().y - subShape1[j].getLocation().y) <= 1) {      // Y distance between the two pieces is 1 or 0
+                        subShape1.push(currentPiece);
+                        j = subShape1.length - 1;
+                    } else {
+                        switchSubs = 2;
+                    }
+                }
+
+                if(switchSubs === 2) {
+                    subShape2.push(currentPiece);
+                    j = subShape2.length - 1;
+                }
+            }
+
+            if(subShape2.length > 0) {
+                gameBoard.removeShape(currentShape);
+
+                shape1 = TETRIS.objects.Shape();
+                shape2 = TETRIS.objects.Shape();
+
+                shape1.createShapeFromPieces(subShape1);
+                gameBoard.addShape(shape1);
+
+                shape2.createShapeFromPieces(subShape2);
+                gameBoard.addShape(shape2);
+            }
+        };
+
+
         return that;
     }
 
@@ -790,7 +846,7 @@ TETRIS.objects = function () {
         };
 
 
-        that.deleteLines = function (listOfIndexes) {
+        that.deleteLines = function (listOfIndexes, gameBoard) {
             var amtOfIndexes = listOfIndexes.length,
                 currentShape = null,
                 listOfEditedShapes = [],
@@ -828,7 +884,9 @@ TETRIS.objects = function () {
 
                 if(currentShape.getPieces() !== null) {
 
-                    // SET UP SPLIT PIECES AS TWO NEW PIECES
+                    if(currentShape.getPieces().length > 1) {
+                        currentShape.splitShape(gameBoard);
+                    }
 
                     currentShape.setUpShapeBoundaries();
                 } else {
@@ -911,6 +969,12 @@ TETRIS.objects = function () {
                         break;
                 }
             }
+        };
+
+
+        that.removeShape = function(sh) {
+            var index = currentShapes.indexOf(sh);
+            currentShapes.splice(index,1);
         };
 
 
