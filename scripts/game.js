@@ -224,17 +224,22 @@ TETRIS.screens['game'] = (function() {
         else{
             if(ticTime/1000 > speed) {
                 if (!currentShape.softDrop(gameBoard)) {
-                    particleStartIndexes = gameBoard.checkForCompleteLines();
-                    beginEffect(particleStartIndexes,gameBoard);
-                    if(particleStartIndexes.length > 0) {
+                    particleStartIndexes = 0;
+
+                   do {
+                        particleStartIndexes = gameBoard.checkForCompleteLines();
+                        beginEffect(particleStartIndexes,gameBoard);
                         gameBoard.deleteLines(particleStartIndexes);
                         gameBoard.fillIn(gameBoard);
-                    }
-                    if(particleStartIndexes != 0){
-                        score += 100 * particleStartIndexes * multiplier;
-                    }
-                    linesCleared += particleStartIndexes.length;
-                    linesToNextDiff += particleStartIndexes.length;
+
+                       if(particleStartIndexes != 0){
+                           score += 100 * particleStartIndexes * multiplier;
+                       }
+
+                       linesCleared += particleStartIndexes.length;
+                       linesToNextDiff += particleStartIndexes.length;
+
+                    } while(particleStartIndexes.length > 0);
 
                     if(linesToNextDiff >= 10){
                         speed = speed - .10;
