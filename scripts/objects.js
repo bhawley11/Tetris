@@ -10,7 +10,8 @@ TETRIS.objects = function () {
         var that = {},
             currentRotationState = 0,
             pieces = [],
-            shape = '';
+            shape = '',
+            spawned = false;
 
 
         that.checkSpawnLocation = function (gameBoard) {
@@ -52,6 +53,7 @@ TETRIS.objects = function () {
             var amtOfPieces = 4,
                 i = 0;
 
+            spawned = false;
             currentRotationState = 0;
             shape = s;
             pieces.length = 0;
@@ -134,12 +136,25 @@ TETRIS.objects = function () {
         };
 
 
-        that.hardDrop = function (gameBoard) {
-            var able = true;
+        that.getSpawned = function() {
+            return spawned;
+        };
 
-            do {
-                able = that.softDrop(gameBoard);
-            } while (able);
+
+        that.hardDrop = function (gameBoard) {
+            var able = true,
+                doneOnce = false;
+
+            if(spawned) {
+                do {
+                    able = that.softDrop(gameBoard);
+
+                    if(able) {
+                        doneOnce = true;
+                    }
+                } while (able);
+                return doneOnce;
+            } else return false;
         };
 
 
@@ -149,19 +164,21 @@ TETRIS.objects = function () {
                 i = 0,
                 loc = undefined;
 
-            for (i = 0; i < amtOfPieces; ++i) {
-                if (pieces[i].getIsLeft()) {
-                    loc = pieces[i].getLocation();
-                    if (!gameBoard.isEmpty({x: loc.x - 1, y: loc.y})) {
-                        able = false;
+            if(spawned) {
+                for (i = 0; i < amtOfPieces; ++i) {
+                    if (pieces[i].getIsLeft()) {
+                        loc = pieces[i].getLocation();
+                        if (!gameBoard.isEmpty({x: loc.x - 1, y: loc.y})) {
+                            able = false;
+                        }
                     }
                 }
-            }
 
-            if (able) {
-                gameBoard.moveShape(this, 'L');
-            }
-            return able;
+                if (able) {
+                    gameBoard.moveShape(this, 'L');
+                }
+                return able;
+            } else return false;
         };
 
 
@@ -171,19 +188,21 @@ TETRIS.objects = function () {
                 i = 0,
                 loc = undefined;
 
-            for (i = 0; i < amtOfPieces; ++i) {
-                if (pieces[i].getIsRight()) {
-                    loc = pieces[i].getLocation();
-                    if (!gameBoard.isEmpty({x: loc.x + 1, y: loc.y})) {
-                        able = false;
+            if(spawned) {
+                for (i = 0; i < amtOfPieces; ++i) {
+                    if (pieces[i].getIsRight()) {
+                        loc = pieces[i].getLocation();
+                        if (!gameBoard.isEmpty({x: loc.x + 1, y: loc.y})) {
+                            able = false;
+                        }
                     }
                 }
-            }
 
-            if (able) {
-                gameBoard.moveShape(this, 'R');
-            }
-            return able;
+                if (able) {
+                    gameBoard.moveShape(this, 'R');
+                }
+                return able;
+            } else return false;
         };
 
 
@@ -232,183 +251,185 @@ TETRIS.objects = function () {
 
                 };
 
-            switch (shape) {
-                case 'B':
-                    return; // Box's don't need to rotate
-                case 'LL':
-                    offsetsA.push({x: 0, y: -2});
-                    offsetsA.push({x: -1, y: -1});
-                    offsetsA.push({x: 0, y: 0});
-                    offsetsA.push({x: 1, y: 1});
+            if(spawned) {
+                switch (shape) {
+                    case 'B':
+                        return; // Box's don't need to rotate
+                    case 'LL':
+                        offsetsA.push({x: 0, y: -2});
+                        offsetsA.push({x: -1, y: -1});
+                        offsetsA.push({x: 0, y: 0});
+                        offsetsA.push({x: 1, y: 1});
 
-                    offsetsB.push({x: 2, y: 0});
-                    offsetsB.push({x: 1, y: -1});
-                    offsetsB.push({x: 0, y: 0});
-                    offsetsB.push({x: -1, y: 1});
+                        offsetsB.push({x: 2, y: 0});
+                        offsetsB.push({x: 1, y: -1});
+                        offsetsB.push({x: 0, y: 0});
+                        offsetsB.push({x: -1, y: 1});
 
-                    offsetsC.push({x: 0, y: 2});
-                    offsetsC.push({x: 1, y: 1});
-                    offsetsC.push({x: 0, y: 0});
-                    offsetsC.push({x: -1, y: -1});
+                        offsetsC.push({x: 0, y: 2});
+                        offsetsC.push({x: 1, y: 1});
+                        offsetsC.push({x: 0, y: 0});
+                        offsetsC.push({x: -1, y: -1});
 
-                    offsetsD.push({x: -2, y: 0});
-                    offsetsD.push({x: -1, y: 1});
-                    offsetsD.push({x: 0, y: 0});
-                    offsetsD.push({x: 1, y: -1});
-                    break;
-                case 'RL':
-                    offsetsA.push({x: -1, y: -1});
-                    offsetsA.push({x: 0, y: 0});
-                    offsetsA.push({x: 1, y: 1});
-                    offsetsA.push({x: 2, y: 0});
+                        offsetsD.push({x: -2, y: 0});
+                        offsetsD.push({x: -1, y: 1});
+                        offsetsD.push({x: 0, y: 0});
+                        offsetsD.push({x: 1, y: -1});
+                        break;
+                    case 'RL':
+                        offsetsA.push({x: -1, y: -1});
+                        offsetsA.push({x: 0, y: 0});
+                        offsetsA.push({x: 1, y: 1});
+                        offsetsA.push({x: 2, y: 0});
 
-                    offsetsB.push({x: 1, y: -1});
-                    offsetsB.push({x: 0, y: 0});
-                    offsetsB.push({x: -1, y: 1});
-                    offsetsB.push({x: 0, y: 2});
+                        offsetsB.push({x: 1, y: -1});
+                        offsetsB.push({x: 0, y: 0});
+                        offsetsB.push({x: -1, y: 1});
+                        offsetsB.push({x: 0, y: 2});
 
-                    offsetsC.push({x: 1, y: 1});
-                    offsetsC.push({x: 0, y: 0});
-                    offsetsC.push({x: -1, y: -1});
-                    offsetsC.push({x: -2, y: 0});
+                        offsetsC.push({x: 1, y: 1});
+                        offsetsC.push({x: 0, y: 0});
+                        offsetsC.push({x: -1, y: -1});
+                        offsetsC.push({x: -2, y: 0});
 
-                    offsetsD.push({x: -1, y: 1});
-                    offsetsD.push({x: 0, y: 0});
-                    offsetsD.push({x: 1, y: -1});
-                    offsetsD.push({x: 0, y: -2});
-                    break;
-                case 'LZ':
-                    offsetsA.push({x: 0, y: -2});
-                    offsetsA.push({x: 1, y: -1});
-                    offsetsA.push({x: 0, y: 0});
-                    offsetsA.push({x: 1, y: 1});
+                        offsetsD.push({x: -1, y: 1});
+                        offsetsD.push({x: 0, y: 0});
+                        offsetsD.push({x: 1, y: -1});
+                        offsetsD.push({x: 0, y: -2});
+                        break;
+                    case 'LZ':
+                        offsetsA.push({x: 0, y: -2});
+                        offsetsA.push({x: 1, y: -1});
+                        offsetsA.push({x: 0, y: 0});
+                        offsetsA.push({x: 1, y: 1});
 
-                    offsetsB.push({x: 2, y: 0});
-                    offsetsB.push({x: 1, y: 1});
-                    offsetsB.push({x: 0, y: 0});
-                    offsetsB.push({x: -1, y: 1});
+                        offsetsB.push({x: 2, y: 0});
+                        offsetsB.push({x: 1, y: 1});
+                        offsetsB.push({x: 0, y: 0});
+                        offsetsB.push({x: -1, y: 1});
 
-                    offsetsC.push({x: 0, y: 2});
-                    offsetsC.push({x: -1, y: 1});
-                    offsetsC.push({x: 0, y: 0});
-                    offsetsC.push({x: -1, y: -1});
+                        offsetsC.push({x: 0, y: 2});
+                        offsetsC.push({x: -1, y: 1});
+                        offsetsC.push({x: 0, y: 0});
+                        offsetsC.push({x: -1, y: -1});
 
-                    offsetsD.push({x: -2, y: 0});
-                    offsetsD.push({x: -1, y: -1});
-                    offsetsD.push({x: 0, y: 0});
-                    offsetsD.push({x: 1, y: -1});
-                    break;
-                case 'RZ':
-                    offsetsA.push({x: -1, y: -1});
-                    offsetsA.push({x: 0, y: 0});
-                    offsetsA.push({x: 1, y: -1});
-                    offsetsA.push({x: 2, y: 0});
+                        offsetsD.push({x: -2, y: 0});
+                        offsetsD.push({x: -1, y: -1});
+                        offsetsD.push({x: 0, y: 0});
+                        offsetsD.push({x: 1, y: -1});
+                        break;
+                    case 'RZ':
+                        offsetsA.push({x: -1, y: -1});
+                        offsetsA.push({x: 0, y: 0});
+                        offsetsA.push({x: 1, y: -1});
+                        offsetsA.push({x: 2, y: 0});
 
-                    offsetsB.push({x: 1, y: -1});
-                    offsetsB.push({x: 0, y: 0});
-                    offsetsB.push({x: 1, y: 1});
-                    offsetsB.push({x: 0, y: 2});
+                        offsetsB.push({x: 1, y: -1});
+                        offsetsB.push({x: 0, y: 0});
+                        offsetsB.push({x: 1, y: 1});
+                        offsetsB.push({x: 0, y: 2});
 
-                    offsetsC.push({x: 1, y: 1});
-                    offsetsC.push({x: 0, y: 0});
-                    offsetsC.push({x: -1, y: 1});
-                    offsetsC.push({x: -2, y: 0});
+                        offsetsC.push({x: 1, y: 1});
+                        offsetsC.push({x: 0, y: 0});
+                        offsetsC.push({x: -1, y: 1});
+                        offsetsC.push({x: -2, y: 0});
 
-                    offsetsD.push({x: -1, y: 1});
-                    offsetsD.push({x: 0, y: 0});
-                    offsetsD.push({x: -1, y: -1});
-                    offsetsD.push({x: 0, y: -2});
-                    break;
-                case 'T':
-                    offsetsA.push({x: 1, y: -1});
-                    offsetsA.push({x: -1, y: -1});
-                    offsetsA.push({x: 0, y: 0});
-                    offsetsA.push({x: 1, y: 1});
+                        offsetsD.push({x: -1, y: 1});
+                        offsetsD.push({x: 0, y: 0});
+                        offsetsD.push({x: -1, y: -1});
+                        offsetsD.push({x: 0, y: -2});
+                        break;
+                    case 'T':
+                        offsetsA.push({x: 1, y: -1});
+                        offsetsA.push({x: -1, y: -1});
+                        offsetsA.push({x: 0, y: 0});
+                        offsetsA.push({x: 1, y: 1});
 
-                    offsetsB.push({x: 1, y: 1});
-                    offsetsB.push({x: 1, y: -1});
-                    offsetsB.push({x: 0, y: 0});
-                    offsetsB.push({x: -1, y: 1});
+                        offsetsB.push({x: 1, y: 1});
+                        offsetsB.push({x: 1, y: -1});
+                        offsetsB.push({x: 0, y: 0});
+                        offsetsB.push({x: -1, y: 1});
 
-                    offsetsC.push({x: -1, y: 1});
-                    offsetsC.push({x: 1, y: 1});
-                    offsetsC.push({x: 0, y: 0});
-                    offsetsC.push({x: -1, y: -1});
+                        offsetsC.push({x: -1, y: 1});
+                        offsetsC.push({x: 1, y: 1});
+                        offsetsC.push({x: 0, y: 0});
+                        offsetsC.push({x: -1, y: -1});
 
-                    offsetsD.push({x: -1, y: -1});
-                    offsetsD.push({x: -1, y: 1});
-                    offsetsD.push({x: 0, y: 0});
-                    offsetsD.push({x: 1, y: -1});
-                    break;
-                case 'I':
-                    offsetsA.push({x: -1, y: -2});
-                    offsetsA.push({x: 0, y: -1});
-                    offsetsA.push({x: 1, y: 0});
-                    offsetsA.push({x: 2, y: 1});
+                        offsetsD.push({x: -1, y: -1});
+                        offsetsD.push({x: -1, y: 1});
+                        offsetsD.push({x: 0, y: 0});
+                        offsetsD.push({x: 1, y: -1});
+                        break;
+                    case 'I':
+                        offsetsA.push({x: -1, y: -2});
+                        offsetsA.push({x: 0, y: -1});
+                        offsetsA.push({x: 1, y: 0});
+                        offsetsA.push({x: 2, y: 1});
 
-                    offsetsB.push({x: 2, y: -1});
-                    offsetsB.push({x: 1, y: 0});
-                    offsetsB.push({x: 0, y: 1});
-                    offsetsB.push({x: -1, y: 2});
+                        offsetsB.push({x: 2, y: -1});
+                        offsetsB.push({x: 1, y: 0});
+                        offsetsB.push({x: 0, y: 1});
+                        offsetsB.push({x: -1, y: 2});
 
-                    offsetsC.push({x: 1, y: 2});
-                    offsetsC.push({x: 0, y: 1});
-                    offsetsC.push({x: -1, y: 0});
-                    offsetsC.push({x: -2, y: -1});
+                        offsetsC.push({x: 1, y: 2});
+                        offsetsC.push({x: 0, y: 1});
+                        offsetsC.push({x: -1, y: 0});
+                        offsetsC.push({x: -2, y: -1});
 
-                    offsetsD.push({x: -2, y: 1});
-                    offsetsD.push({x: -1, y: 0});
-                    offsetsD.push({x: 0, y: -1});
-                    offsetsD.push({x: 1, y: -2});
-                    break;
-                default:
-                    console.log('Shape is not registered: Rotate');
-                    break;
-            }
+                        offsetsD.push({x: -2, y: 1});
+                        offsetsD.push({x: -1, y: 0});
+                        offsetsD.push({x: 0, y: -1});
+                        offsetsD.push({x: 1, y: -2});
+                        break;
+                    default:
+                        console.log('Shape is not registered: Rotate');
+                        break;
+                }
 
-            if (dir == 'r') {
-                toState = (currentRotationState < 3) ? currentRotationState + 1 : 0;
-            }
-            else {
-                toState = (currentRotationState > 0) ? currentRotationState - 1 : 3;
-            }
+                if (dir == 'r') {
+                    toState = (currentRotationState < 3) ? currentRotationState + 1 : 0;
+                }
+                else {
+                    toState = (currentRotationState > 0) ? currentRotationState - 1 : 3;
+                }
 
-            switch (toState) {
-                case 0:
-                    if (dir == 'r') {
-                        offsetsSelected = offsetsA;
-                    } else {
-                        offsetsSelected = offsetsD;
-                    }
-                    break;
-                case 1:
-                    if (dir == 'r') {
-                        offsetsSelected = offsetsB;
-                    } else {
-                        offsetsSelected = offsetsA;
-                    }
-                    break;
-                case 2:
-                    if (dir == 'r') {
-                        offsetsSelected = offsetsC;
-                    } else {
-                        offsetsSelected = offsetsB;
-                    }
-                    break;
-                case 3:
-                    if (dir == 'r') {
-                        offsetsSelected = offsetsD;
-                    } else {
-                        offsetsSelected = offsetsC;
-                    }
-                    break;
-            }
+                switch (toState) {
+                    case 0:
+                        if (dir == 'r') {
+                            offsetsSelected = offsetsA;
+                        } else {
+                            offsetsSelected = offsetsD;
+                        }
+                        break;
+                    case 1:
+                        if (dir == 'r') {
+                            offsetsSelected = offsetsB;
+                        } else {
+                            offsetsSelected = offsetsA;
+                        }
+                        break;
+                    case 2:
+                        if (dir == 'r') {
+                            offsetsSelected = offsetsC;
+                        } else {
+                            offsetsSelected = offsetsB;
+                        }
+                        break;
+                    case 3:
+                        if (dir == 'r') {
+                            offsetsSelected = offsetsD;
+                        } else {
+                            offsetsSelected = offsetsC;
+                        }
+                        break;
+                }
 
-            attemptedOffsets = attemptRotation(offsetsSelected);
-            if (attemptedOffsets !== null) {            // This actually performs the rotation
-                gameBoard.rotateShape(this, attemptedOffsets);
-                currentRotationState = toState;
-                that.setUpShapeBoundaries();
+                attemptedOffsets = attemptRotation(offsetsSelected);
+                if (attemptedOffsets !== null) {            // This actually performs the rotation
+                    gameBoard.rotateShape(this, attemptedOffsets);
+                    currentRotationState = toState;
+                    that.setUpShapeBoundaries();
+                }
             }
         };
 
@@ -432,24 +453,27 @@ TETRIS.objects = function () {
                 i = 0,
                 loc = undefined;
 
-            for (i = 0; i < amtOfPieces; ++i) {              // Check if all bottom pieces are empty below them
-                if (pieces[i].getIsBottom()) {
-                    loc = pieces[i].getLocation();
+            if(spawned) {
+                for (i = 0; i < amtOfPieces; ++i) {              // Check if all bottom pieces are empty below them
+                    if (pieces[i].getIsBottom()) {
+                        loc = pieces[i].getLocation();
 
-                    if (!gameBoard.isEmpty({x: loc.x, y: loc.y + 1})) {
-                        able = false;
+                        if (!gameBoard.isEmpty({x: loc.x, y: loc.y + 1})) {
+                            able = false;
+                        }
                     }
                 }
-            }
 
-            if (able) {
-                gameBoard.moveShape(this, 'D');
-            }
-            return able;
+                if (able) {
+                    gameBoard.moveShape(this, 'D');
+                }
+                return able;
+            } else return false;
         };
 
 
         that.spawn = function (gameBoard) {
+            spawned = true;
             if (that.checkSpawnLocation(gameBoard)) {
                 gameBoard.addShape(this);
             }
@@ -695,6 +719,7 @@ TETRIS.objects = function () {
                 loc = pieces[i].getLocation();
                 grid[loc.x][loc.y] = pieces[i];
             }
+
             currentShapes.push(s);
         };
 
@@ -804,13 +829,41 @@ TETRIS.objects = function () {
             }
 
             for(i = 0; i < listOfEditedShapes.length; ++i) {                        // This will update each pieces knowledge after deletions
-                currentShape = listOfEditedShapes[i].setUpShapeBoundaries();
+                currentShape = listOfEditedShapes[i];
+
+                if(currentShape.getPieces() !== null) {
+
+                    // SET UP SPLIT PIECES AS TWO NEW PIECES
+
+                    currentShape.setUpShapeBoundaries();
+                } else {
+                    index = currentShapes.indexOf(currentShape);
+                    currentShapes.splice(index,1);
+                }
             }
         };
 
 
-        that.fillIn = function () {
+        that.fillIn = function (gameBoard) {
+            var able = false,
+                amtOfShapes = currentShapes.length,
+                currentShape = null,
+                somethingDropped = true,
+                i = 0;
 
+            while(somethingDropped) {
+                somethingDropped = false;
+
+                for (i = 0; i < amtOfShapes; ++i) {
+                    currentShape = currentShapes[i];
+
+                    able = currentShape.softDrop(gameBoard)
+
+                    if (able) {
+                        somethingDropped = true;
+                    }
+                }
+            }
         };
 
 
@@ -862,22 +915,6 @@ TETRIS.objects = function () {
                         }
                         break;
                 }
-            }
-        };
-
-
-        that.removeShape = function (s) {
-            var amtOfPieces = s.getPieces().length,
-                index = currentShapes.indexOf(s),
-                loc = null,
-                pieces = s.getPieces(),
-                i = 0;
-
-            currentShapes.splice(index, 1);                      // Remove the shape from the grid's list of shapes
-
-            for (i = 0; i < amtOfPieces; ++i) {
-                loc = pieces[i].getLocation();
-                grid[loc.x][loc.y] = null;                      // Set the grid to null where piece was located
             }
         };
 

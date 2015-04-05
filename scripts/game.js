@@ -20,6 +20,7 @@ TETRIS.screens['game'] = (function() {
         ticTime = 0,
         shapeHistory = [],
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
+        abbrevForNextShape = '',
     
         score = 0;
 
@@ -157,8 +158,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function run() {
-        var abbrevForNextShape,
-            nextShapeSpec;
+        var nextShapeSpec;
 
         score = 0;
 
@@ -188,8 +188,6 @@ TETRIS.screens['game'] = (function() {
         currentShape.spawn(gameBoard);
 
         abbrevForNextShape = nextShape();
-        shapeOnDeck = TETRIS.objects.Shape();
-        shapeOnDeck.createShape(abbrevForNextShape);
 
         nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
         shapeOnDeckImage = TETRIS.graphics.Texture({
@@ -202,8 +200,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function update() {
-        var abbrevForNextShape,
-            nextShapeSpec;
+        var nextShapeSpec;
 
         if(gameOver){
             var name = prompt("Please enter your name", "");
@@ -217,20 +214,20 @@ TETRIS.screens['game'] = (function() {
         }
         else{
             if(ticTime/1000 > .75) {
-                if(!currentShape.softDrop(gameBoard)){
+                if(currentShape.getSpawned() && !currentShape.softDrop(gameBoard)){
                     gameBoard.checkForCompleteLines();
+                    gameBoard.fillIn(gameBoard);
 
                     currentShape = TETRIS.objects.Shape();
-                    currentShape.createShape(shapeOnDeck.getShapeAbbrev());
+                    currentShape.createShape(abbrevForNextShape);
 
                     if(currentShape.checkSpawnLocation(gameBoard)) {
+                        currentShape.spawn(gameBoard);
+
                         // Next Shape
                         abbrevForNextShape = nextShape();
-                        shapeOnDeck = TETRIS.objects.Shape();
-                        shapeOnDeck.createShape(abbrevForNextShape);
-
-                        // Next Shape Image
                         nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+
                         shapeOnDeckImage = TETRIS.graphics.Texture({
                             image : nextShapeSpec.image,
                             center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
