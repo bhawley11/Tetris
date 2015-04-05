@@ -21,7 +21,11 @@ TETRIS.screens['game'] = (function() {
         shapeHistory = [],
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
     
-        score = 0;
+        score = 0,
+        speed,
+        linesCleared,
+        linesToNextDiff = 0,
+        particleStartIndexes = [];
 
     function init() {
         console.log('Tetris initializing...');
@@ -161,7 +165,9 @@ TETRIS.screens['game'] = (function() {
             nextShapeSpec;
 
         score = 0;
-
+        speed = .75;
+        linesCleared = 0;
+        particleStartIndexes.length = 0;
         gameOver = false;
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
@@ -216,14 +222,28 @@ TETRIS.screens['game'] = (function() {
             TETRIS.main.showScreen('menu');
         }
         else{
-            if(ticTime/1000 > .75) {
-                if(!currentShape.softDrop(gameBoard)){
-                    gameBoard.checkForCompleteLines();
+            if(ticTime/1000 > speed) {
+                if (!currentShape.softDrop(gameBoard)) {
+                    particleStartIndexes = gameBoard.checkForCompleteLines();
+                    beginEffect(particleStartIndexes,gameBoard);
+                    if(particleStartIndexes.length > 0) {
+                        gameBoard.deleteLines(particleStartIndexes);
+                    }
+                    linesCleared += particleStartIndexes.length;
+                    linesToNextDiff += particleStartIndexes.length;
+
+                    if(linesToNextDiff >= 10){
+                        speed = speed - .10;
+                        if(speed < 0){
+                            speed = .10;
+                        }
+                        linesToNextDiff = 0;
+                    }
 
                     currentShape = TETRIS.objects.Shape();
                     currentShape.createShape(shapeOnDeck.getShapeAbbrev());
 
-                    if(currentShape.checkSpawnLocation(gameBoard)) {
+                    if (currentShape.checkSpawnLocation(gameBoard)) {
                         // Next Shape
                         abbrevForNextShape = nextShape();
                         shapeOnDeck = TETRIS.objects.Shape();
@@ -232,18 +252,17 @@ TETRIS.screens['game'] = (function() {
                         // Next Shape Image
                         nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
                         shapeOnDeckImage = TETRIS.graphics.Texture({
-                            image : nextShapeSpec.image,
-                            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
-                            width : nextShapeSpec.width, height : nextShapeSpec.height
+                            image: nextShapeSpec.image,
+                            center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                            width: nextShapeSpec.width, height: nextShapeSpec.height
                         });
-
                     } else {
                         gameOver = true;
                     }
                 }
-                ticTime= 0;
+                particleStartIndexes.length = 0;
+                ticTime = 0;
             }
-
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
 
