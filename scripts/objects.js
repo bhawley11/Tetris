@@ -769,11 +769,6 @@ TETRIS.objects = function () {
                     listOfFullRowIndexes.push(y);
                 }
             }
-
-            if(listOfFullRowIndexes.length > 0) {
-                that.deleteLines(listOfFullRowIndexes);
-            }
-
             return listOfFullRowIndexes;            // We will return the list of indexes for scoring and particle effects
         };
 

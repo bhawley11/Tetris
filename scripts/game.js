@@ -22,7 +22,12 @@ TETRIS.screens['game'] = (function() {
         listOfShapes = ['B','LL','RL','LZ','RZ','T','I'],
         abbrevForNextShape = '',
     
-        score = 0;
+        score = 0,
+        multiplier,
+        speed,
+        linesCleared,
+        linesToNextDiff = 0,
+        particleStartIndexes = [];
 
     function init() {
         console.log('Tetris initializing...');
@@ -160,8 +165,11 @@ TETRIS.screens['game'] = (function() {
     function run() {
         var nextShapeSpec;
 
+        multiplier = 1;
         score = 0;
-
+        speed = .75;
+        linesCleared = 0;
+        particleStartIndexes.length = 0;
         gameOver = false;
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
@@ -204,7 +212,8 @@ TETRIS.screens['game'] = (function() {
 
         if(gameOver){
             var name = prompt("Please enter your name", "");
-            TETRIS.screens['highScores'].addScore(name, score);
+
+            TETRIS.screens['highScores'].addScore(name, parseInt(score));
             TETRIS.onGameScreen = false;
             if(TETRIS.grid != null){
                 TETRIS.grid.clearGrid();
@@ -213,10 +222,28 @@ TETRIS.screens['game'] = (function() {
             TETRIS.main.showScreen('menu');
         }
         else{
-            if(ticTime/1000 > .75) {
-                if(currentShape.getSpawned() && !currentShape.softDrop(gameBoard)){
-                    gameBoard.checkForCompleteLines();
-                    gameBoard.fillIn(gameBoard);
+            if(ticTime/1000 > speed) {
+                if (!currentShape.softDrop(gameBoard)) {
+                    particleStartIndexes = gameBoard.checkForCompleteLines();
+                    beginEffect(particleStartIndexes,gameBoard);
+                    if(particleStartIndexes.length > 0) {
+                        gameBoard.deleteLines(particleStartIndexes);
+                        gameBoard.fillIn(gameBoard);
+                    }
+                    if(particleStartIndexes != 0){
+                        score += 100 * particleStartIndexes * multiplier;
+                    }
+                    linesCleared += particleStartIndexes.length;
+                    linesToNextDiff += particleStartIndexes.length;
+
+                    if(linesToNextDiff >= 10){
+                        speed = speed - .10;
+                        multiplier += 1;
+                        if(speed < 0){
+                            speed = .10;
+                        }
+                        linesToNextDiff = 0;
+                    }
 
                     currentShape = TETRIS.objects.Shape();
                     currentShape.createShape(abbrevForNextShape);
@@ -229,18 +256,17 @@ TETRIS.screens['game'] = (function() {
                         nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
 
                         shapeOnDeckImage = TETRIS.graphics.Texture({
-                            image : nextShapeSpec.image,
-                            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
-                            width : nextShapeSpec.width, height : nextShapeSpec.height
+                            image: nextShapeSpec.image,
+                            center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                            width: nextShapeSpec.width, height: nextShapeSpec.height
                         });
-
                     } else {
                         gameOver = true;
                     }
                 }
-                ticTime= 0;
+                particleStartIndexes.length = 0;
+                ticTime = 0;
             }
-
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
 

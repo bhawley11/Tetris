@@ -6,15 +6,29 @@ TETRIS.particleSystem = (function() {
     nextName = 1;
 
 
-    beginEffect = function(id) {
-        var i = 9,
-            x,
-            y = (id * 35) + 17.5 + 50;
+    beginEffect = function(ids, theBoard) {
+        var i = 0,
+            j = 0,
+            k = 0,
+            x = 0,
+            y = 0;
+            theGrid = theBoard.getGrid();
+        if(ids.length != 0) {
+            for (i; i < ids.length; i++) {
+                for (j; j < 10; j++) {
+                    x = 75 + (j * 35 + 17.5);
+                    y = ((ids[i] - 2) * 35) + 17.5 + 50;
 
-            for(i; i>=0; i--){
-                x = 75 + (i * 35 + 17.5);
-                createParticles(x,y);
+                    console.log('x: ' + ids[i] + " y: " + j);
+
+                    for (k; k < 4; k++) {
+                        createParticles(x, y, theGrid[j][ids[i]].getImage());
+                    }
+                    k = 0;
+                }
+                j = 0;
             }
+        }
     };
 
     //I used a lot of code from Dr. Dean Mathias's in class example I simply changed the
@@ -28,7 +42,6 @@ TETRIS.particleSystem = (function() {
         for( item in particles) {
             if(particles.hasOwnProperty(item)){
                 particle = particles[item];
-
                 particle.alive += elapsedTime;
                 particle.center.x +=(elapsedTime * particle.speed * particle.direction.x);
                 particle.center.y +=(elapsedTime * particle.speed * particle.direction.y);
@@ -47,10 +60,10 @@ TETRIS.particleSystem = (function() {
         drawParticles();
     };
 
-    createParticles = function(centerX , centerY){
+    createParticles = function(centerX , centerY, newImage){
         var particle = {
-            image : TETRIS.images['images/fire/warthog_fire_1.png'],
-            size : Random.nextGaussian(10,4),
+            image : newImage,
+            size : Random.nextGaussian(15,2),
             center : {x: centerX, y: centerY},
             direction : Random.nextCircleVector(),
             speed : Random.nextGaussian(.1,.01),
