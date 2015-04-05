@@ -212,7 +212,7 @@ TETRIS.screens['game'] = (function() {
         if(gameOver){
             var name = prompt("Please enter your name", "");
 
-            TETRIS.screens['highScores'].addScore(name, parseInt(score));
+            TETRIS.screens['highScores'].addScore(name, score);
             TETRIS.onGameScreen = false;
 
             cancelNextRequest = true;
@@ -230,7 +230,7 @@ TETRIS.screens['game'] = (function() {
                         gameBoard.fillIn(gameBoard);
 
                        if(particleStartIndexes != 0){
-                           score += 100 * particleStartIndexes * multiplier;
+                           score += 100 * particleStartIndexes.length * multiplier;
                        }
 
                        linesCleared += particleStartIndexes.length;
