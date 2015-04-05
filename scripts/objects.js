@@ -852,7 +852,7 @@ TETRIS.objects = function () {
                 for (i = 0; i < amtOfShapes; ++i) {
                     currentShape = currentShapes[i];
 
-                    able = currentShape.softDrop(gameBoard)
+                    able = currentShape.softDrop(gameBoard);
 
                     if (able) {
                         somethingDropped = true;
