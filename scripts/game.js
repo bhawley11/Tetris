@@ -22,7 +22,13 @@ TETRIS.screens['game'] = (function() {
         abbrevForNextShape = '',
     
         score = 0,
+        topScore,
+        level,
         multiplier,
+        pointsForOneLine,
+        pointsForTwoLines,
+        pointsForThreeLines,
+        pointsForFourLines,
         speed,
         linesCleared,
         linesToNextDiff = 0,
@@ -166,6 +172,11 @@ TETRIS.screens['game'] = (function() {
 
         multiplier = 1;
         score = 0;
+        level = 1;
+        pointsForOneLine = 40;
+        pointsForTwoLines = 100;
+        pointsForThreeLines = 300;
+        pointsForFourLines = 1200;
         speed = .75;
         linesCleared = 0;
         particleStartIndexes.length = 0;
@@ -186,6 +197,16 @@ TETRIS.screens['game'] = (function() {
         for(var i = 0; i < 4; i++) {
             shapeHistory.push('LZ');
         }
+
+        $.ajax({
+            url: 'http://localhost:3000/v1/high-scores',
+            cache : false,
+            type: 'GET',
+            error: function() {alert('GET failed');},
+            success: function(data){
+                topScore = data[0].score;
+            }
+        });
 
         gameBoard = TETRIS.objects.GameBoard();
         gameBoard.createGameBoard();
@@ -210,7 +231,7 @@ TETRIS.screens['game'] = (function() {
         var nextShapeSpec;
 
         if(gameOver){
-            var name = prompt("Please enter your name", "");
+            var name = prompt("Please enter your name", "Chief");
 
             if(name === ''){
                 name = 'Unknown';
@@ -232,8 +253,19 @@ TETRIS.screens['game'] = (function() {
                         gameBoard.deleteLines(particleStartIndexes, gameBoard);
                         gameBoard.fillIn(gameBoard);
 
-                       if(particleStartIndexes != 0){
-                           score += 100 * particleStartIndexes.length * multiplier;
+                       if(particleStartIndexes.length != 0){
+                           if(particleStartIndexes.length === 1){
+                               score += multiplier * pointsForOneLine;
+                           }
+                           else if(particleStartIndexes.length === 2){
+                               score += multiplier * pointsForTwoLines;
+                           }
+                           else if(particleStartIndexes.length === 3){
+                               score += multiplier * pointsForThreeLines;
+                           }
+                           else{
+                               score += multiplier * pointsForFourLines;
+                           }
                        }
 
                        linesCleared += particleStartIndexes.length;
@@ -244,6 +276,7 @@ TETRIS.screens['game'] = (function() {
                     if(linesToNextDiff >= 10){
                         speed = speed - .10;
                         multiplier += 1;
+                        level += 1;
                         if(speed < 0){
                             speed = .10;
                         }
@@ -269,12 +302,20 @@ TETRIS.screens['game'] = (function() {
                         gameOver = true;
                     }
                 }
+                score++;
                 particleStartIndexes.length = 0;
                 ticTime = 0;
             }
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
+        updateScoreBoard();
+    }
 
+    function updateScoreBoard(){
+        scoreBoard.setLevel(level);
+        scoreBoard.setScore(score);
+        scoreBoard.setLines(linesCleared);
+        scoreBoard.setTopScore(topScore);
     }
 
     function rotateLeft(){
@@ -294,7 +335,7 @@ TETRIS.screens['game'] = (function() {
     }
 
     function hardDrop(){
-        currentShape.hardDrop(gameBoard);
+        score += currentShape.hardDrop(gameBoard);
     }
 
     function softDrop(){
