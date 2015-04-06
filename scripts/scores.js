@@ -2,8 +2,7 @@
  * Created by Shaun on 4/2/2015.
  */
 var fs = require('fs'),
-    scores = [],
-    nextId = 0;
+    scores = [];
 
 fs.readFile('score.txt', 'utf8', function(err, data){
     if(err){
@@ -21,10 +20,10 @@ fs.readFile('score.txt', 'utf8', function(err, data){
     else{
         var highScoreArray = data.split('-');
         for(var i = 0; i < highScoreArray.length; i++){
-            var newScore = highScoreArray[i].split("/");
+            var newRecord = highScoreArray[i].split("/");
             scores.push({});
-            scores[i].name = newScore[0];
-            scores[i].score = newScore[1];
+            scores[i].name = newRecord[0];
+            scores[i].score = newRecord[1];
         }
     }
 });
@@ -47,26 +46,33 @@ exports.add = function(request, response) {
     console.log('Name: ' + request.query.name);
     console.log('Score: ' + request.query.score);
 
-    var newName = request.query.name,
+    var i = 0,
+        newName = request.query.name,
         newScore = request.query.score,
-        appendString = '-' + newName + '/' + newScore;
+        appendString ='';
 
-        fs.appendFile('score.txt', appendString, function (err) {
-            if (err) {
-                console.log("Error Writing to File!");
-            }
-        });
-
-
-    var now = new Date();
-    scores.push( {
-        id : nextId,
-        name : newName,
-        score : newScore,
-        date : now.toLocaleDateString(),
-        time : now.toLocaleTimeString()
-    });
-    nextId++;
+    scores.push({name : newName, score:newScore});
+    sortScores();
+    scores.splice(10, scores.length - 10);
+    fs.truncate('score.txt', 0, function(){console.log('done')});
+    for(i; i < 10; i++){
+        if(i === 0){
+            appendString = scores[i].name + '/' + scores[i].score;
+            fs.appendFile('score.txt', appendString, function(err){
+                if(err){
+                    console.log("Error Writing File!");
+                }
+            })
+        }
+        else{
+            appendString = '-' + scores[i].name + '/' + scores[i].score;
+            fs.appendFile('score.txt', appendString, function (err) {
+                if (err) {
+                    console.log("Error Writing to File!");
+                }
+            });
+        }
+    }
 
     response.writeHead(200);
     response.end();

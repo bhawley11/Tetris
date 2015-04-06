@@ -212,6 +212,9 @@ TETRIS.screens['game'] = (function() {
         if(gameOver){
             var name = prompt("Please enter your name", "");
 
+            if(name === ''){
+                name = 'Unknown';
+            }
             TETRIS.screens['highScores'].addScore(name, score);
             TETRIS.onGameScreen = false;
 
