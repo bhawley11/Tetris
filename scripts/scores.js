@@ -54,11 +54,10 @@ exports.add = function(request, response) {
     scores.push({name : newName, score:newScore});
     sortScores();
     scores.splice(10, scores.length - 10);
-    fs.truncate('score.txt', 0, function(){console.log('done')});
     for(i; i < 10; i++){
         if(i === 0){
             appendString = scores[i].name + '/' + scores[i].score;
-            fs.appendFile('score.txt', appendString, function(err){
+            fs.writeFile('score.txt', appendString, function(err){
                 if(err){
                     console.log("Error Writing File!");
                 }
