@@ -201,6 +201,11 @@ TETRIS.graphics = (function() {
             ctx.stroke();
             ctx.restore();
 
+            levelFont.setText('LEVEL : ' + spec.level);
+            linesFont.setText('LINES : ' + spec.lines);
+            scoreFont.setText('SCORE : ' + spec.score);
+            topScoreFont.setText('TOP SCORE : ' + spec.topScore);
+
             levelFont.draw();
             linesFont.draw();
             scoreFont.draw();
