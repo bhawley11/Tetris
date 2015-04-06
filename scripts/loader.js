@@ -33,8 +33,26 @@ window.addEventListener('load', function() {
             load : [
                 /* SOUNDS */
                 /* sound are causing an unhandled exception ILLEGAL TOKEN */
+                'preload!sounds/music/game_theme.' + TETRIS.audioExt,
                 'preload!sounds/music/title_theme.' + TETRIS.audioExt,
                 'preload!sounds/voice/victory.' + TETRIS.audioExt,
+                'preload!sounds/effects/boltshot_shot.' + TETRIS.audioExt,
+                'preload!sounds/effects/br_scope_in.' + TETRIS.audioExt,
+                'preload!sounds/effects/br_scope_out.' + TETRIS.audioExt,
+                'preload!sounds/effects/magnum_scope_in.' + TETRIS.audioExt,
+                'preload!sounds/effects/magnum_scope_out.' + TETRIS.audioExt,
+                'preload!sounds/effects/dmr_scope_out.' + TETRIS.audioExt,
+                'preload!sounds/effects/button_noise.' + TETRIS.audioExt,
+                'preload!sounds/voice/double_kill.' + TETRIS.audioExt,
+                'preload!sounds/voice/triple_kill.' + TETRIS.audioExt,
+                'preload!sounds/voice/overkill.' + TETRIS.audioExt,
+                'preload!sounds/voice/killtacular.' + TETRIS.audioExt,
+                'preload!sounds/voice/killtrocity.' + TETRIS.audioExt,
+                'preload!sounds/voice/killimanjaro.' + TETRIS.audioExt,
+                'preload!sounds/voice/killtastrophe.' + TETRIS.audioExt,
+                'preload!sounds/voice/killpocalypse.' + TETRIS.audioExt,
+                'preload!sounds/voice/killionaire.' + TETRIS.audioExt,
+
 
                 /* IMAGES */
                 'preload!images/fire/warthog_fire_1.png',

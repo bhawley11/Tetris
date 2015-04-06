@@ -25,6 +25,7 @@ TETRIS.screens['menu'] = (function() {
 
     function run() {
         var menuMusic = TETRIS.sounds['sounds/music/title_theme.' + TETRIS.audioExt];
+        menuMusic.volume = .1;
         menuMusic.currentTime = 0;
         if(menuMusic === undefined || menuMusic.paused) {
             menuMusic.addEventListener('ended', function () {

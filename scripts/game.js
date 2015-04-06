@@ -28,6 +28,21 @@ TETRIS.screens['game'] = (function() {
         linesToNextDiff = 0,
         particleStartIndexes = [];
 
+
+    function beginGameMusic() {
+        var gameMusic = TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt];
+        gameMusic.currentTime = 0;
+        gameMusic.volume = .05;
+        if(gameMusic === undefined || gameMusic.paused) {
+            gameMusic.addEventListener('ended', function () {
+                gameMusic.currentTime = 0;
+                gameMusic.play();
+            }, false);
+            gameMusic.play();
+        }
+    }
+
+
     function init() {
         console.log('Tetris initializing...');
 
@@ -37,6 +52,7 @@ TETRIS.screens['game'] = (function() {
                 TETRIS.grid.clearGrid();
             }
             cancelNextRequest = true;
+            TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt].pause();
             TETRIS.main.showScreen('menu');
         });
 
@@ -58,6 +74,7 @@ TETRIS.screens['game'] = (function() {
         });
     }
 
+
     function gameLoop(time) {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
@@ -71,6 +88,7 @@ TETRIS.screens['game'] = (function() {
             TETRIS.sessionID = requestAnimationFrame(gameLoop);
         }
     }
+
 
     function getNextShapeDetails(shape) {
         switch(shape) {
@@ -119,6 +137,7 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
     function render() {
         TETRIS.graphics.clear();
         playScreen.draw();
@@ -131,6 +150,7 @@ TETRIS.screens['game'] = (function() {
             shapeOnDeckImage.draw();
         }
     }
+
 
     function nextShape(){
         var i = 0,
@@ -151,6 +171,7 @@ TETRIS.screens['game'] = (function() {
         return randomChoice;
     }
 
+
     function inHistory(shape){
         var i = 0;
         for(i; i < shapeHistory.length; i++){
@@ -160,6 +181,47 @@ TETRIS.screens['game'] = (function() {
         }
         return false;
     }
+
+
+    function playRowDeleteVoiceEffect(numDeleted) {
+        var voice = null;
+
+        switch(numDeleted) {
+            case 2:
+                voice = TETRIS.sounds['sounds/voice/double_kill.' + TETRIS.audioExt];
+                break;
+            case 3:
+                voice = TETRIS.sounds['sounds/voice/triple_kill.' + TETRIS.audioExt];
+                break;
+            case 4:
+                voice = TETRIS.sounds['sounds/voice/overkill.' + TETRIS.audioExt];
+                break;
+            case 5:
+                voice = TETRIS.sounds['sounds/voice/killtacular.' + TETRIS.audioExt];
+                break;
+            case 6:
+                voice = TETRIS.sounds['sounds/voice/killtrocity.' + TETRIS.audioExt];
+                break;
+            case 7:
+                voice = TETRIS.sounds['sounds/voice/killimanjaro.' + TETRIS.audioExt];
+                break;
+            case 8:
+                voice = TETRIS.sounds['sounds/voice/killtastrophe.' + TETRIS.audioExt];
+                break;
+            case 9:
+                voice = TETRIS.sounds['sounds/voice/killpocalypse.' + TETRIS.audioExt];
+                break;
+            case 10:
+                voice = TETRIS.sounds['sounds/voice/killionaire.' + TETRIS.audioExt];
+                break;
+        }
+
+        if(voice !== null) {
+            voice.currentTime = 0;
+            voice.play();
+        }
+    };
+
 
     function run() {
         var nextShapeSpec;
@@ -177,6 +239,8 @@ TETRIS.screens['game'] = (function() {
         TETRIS.lastTime = performance.now();
 
         TETRIS.keyboard.clearKeyboardState();
+
+        beginGameMusic();
 
         if(TETRIS.sessionID != null) {
             cancelAnimationFrame(TETRIS.sessionID);
@@ -206,8 +270,11 @@ TETRIS.screens['game'] = (function() {
         TETRIS.sessionID = requestAnimationFrame(gameLoop);
     }
 
+
     function update() {
-        var nextShapeSpec;
+        var linesDeletedThisUpdate = 0,
+            nextShapeSpec,
+            soundEffect = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt];
 
         if(gameOver){
             var name = prompt("Please enter your name", "");
@@ -218,6 +285,7 @@ TETRIS.screens['game'] = (function() {
             TETRIS.screens['highScores'].addScore(name, score);
             TETRIS.onGameScreen = false;
 
+            TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt].pause();
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
         }
@@ -236,10 +304,18 @@ TETRIS.screens['game'] = (function() {
                            score += 100 * particleStartIndexes.length * multiplier;
                        }
 
+                       linesDeletedThisUpdate += particleStartIndexes.length;
                        linesCleared += particleStartIndexes.length;
                        linesToNextDiff += particleStartIndexes.length;
 
                     } while(particleStartIndexes.length > 0);
+
+                    if(linesDeletedThisUpdate === 0) {
+                        soundEffect.play();
+                    } else {
+                        console.log(linesDeletedThisUpdate);
+                        playRowDeleteVoiceEffect(linesDeletedThisUpdate);
+                    }
 
                     if(linesToNextDiff >= 10){
                         speed = speed - .10;
@@ -269,6 +345,7 @@ TETRIS.screens['game'] = (function() {
                         gameOver = true;
                     }
                 }
+
                 particleStartIndexes.length = 0;
                 ticTime = 0;
             }
@@ -277,20 +354,37 @@ TETRIS.screens['game'] = (function() {
 
     }
 
+
     function rotateLeft(){
-        currentShape.rotate(gameBoard, 'l');
+        var soundEffect = TETRIS.sounds['sounds/effects/magnum_scope_out.' + TETRIS.audioExt];
+        if(currentShape.rotate(gameBoard, 'l')){
+            soundEffect.currentTime = 0;
+            soundEffect.play();
+        }
     }
 
     function rotateRight(){
-        currentShape.rotate(gameBoard, 'r');
+        var soundEffect = TETRIS.sounds['sounds/effects/magnum_scope_in.' + TETRIS.audioExt];
+        if(currentShape.rotate(gameBoard, 'r')){
+            soundEffect.currentTime = 0;
+            soundEffect.play();
+        }
     }
 
     function moveLeft(){
-        currentShape.moveLeft(gameBoard);
+        var soundEffect = TETRIS.sounds['sounds/effects/br_scope_out.' + TETRIS.audioExt];
+        if(currentShape.moveLeft(gameBoard)) {
+            soundEffect.currentTime = 0;
+            soundEffect.play();
+        }
     }
 
     function moveRight(){
-        currentShape.moveRight(gameBoard);
+        var soundEffect = TETRIS.sounds['sounds/effects/br_scope_in.' + TETRIS.audioExt];
+        if(currentShape.moveRight(gameBoard)) {
+            soundEffect.currentTime = 0;
+            soundEffect.play();
+        }
     }
 
     function hardDrop(){
@@ -298,7 +392,14 @@ TETRIS.screens['game'] = (function() {
     }
 
     function softDrop(){
-        currentShape.softDrop(gameBoard);
+        var soundEffect = TETRIS.sounds['sounds/effects/button_noise.' + TETRIS.audioExt];
+        soundEffect.volume = .05;
+        if(currentShape.softDrop(gameBoard)) {
+            soundEffect.currentTime = 0;
+            soundEffect.play();
+            return true;
+        }
+        return false;
     }
 
     return {
