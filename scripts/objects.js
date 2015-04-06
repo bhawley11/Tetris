@@ -439,7 +439,9 @@ TETRIS.objects = function () {
                     gameBoard.rotateShape(this, attemptedOffsets);
                     currentRotationState = toState;
                     that.setUpShapeBoundaries();
+                    return true;
                 }
+                else return false;
             }
         };
 

@@ -24,13 +24,15 @@ TETRIS.screens['menu'] = (function() {
     }
 
     function run() {
-        if(TETRIS.menuMusic === undefined || TETRIS.menuMusic.paused) {
-            TETRIS.menuMusic = new Audio('/sounds/music/title_theme.mp3');
-            TETRIS.menuMusic.addEventListener('ended', function () {
-                TETRIS.menuMusic.currentTime = 0;
-                TETRIS.menuMusic.play();
+        var menuMusic = TETRIS.sounds['sounds/music/title_theme.' + TETRIS.audioExt];
+        menuMusic.volume = .1;
+        menuMusic.currentTime = 0;
+        if(menuMusic === undefined || menuMusic.paused) {
+            menuMusic.addEventListener('ended', function () {
+                menuMusic.currentTime = 0;
+                menuMusic.play();
             }, false);
-            TETRIS.menuMusic.play();
+            menuMusic.play();
         }
     }
 
