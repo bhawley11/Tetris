@@ -9,6 +9,7 @@
 var TETRIS = {
     images : {},
     screens : {},
+    sounds : {},
     status : {
         preloadRequest : 0,
         preloadComplete : 0
@@ -17,13 +18,23 @@ var TETRIS = {
 
 window.addEventListener('load', function() {
     console.log('Loading resources...');
+    TETRIS.audioExt = '';
+
+    if (Modernizr.audio.mp3 === 'probably') {
+        console.log('We have MP3 support');
+        TETRIS.audioExt = 'mp3';
+    } else if (Modernizr.audio.wav === 'probably') {
+        console.log('We have WAV support');
+        TETRIS.audioExt = 'wav';
+    }
+
     Modernizr.load([
         {
             load : [
                 /* SOUNDS */
                 /* sound are causing an unhandled exception ILLEGAL TOKEN */
-                'preload!sounds/music/title_theme.mp3',
-                'preload!sounds/voice/victory.mp3',
+                'preload!sounds/music/title_theme.' + TETRIS.audioExt,
+                'preload!sounds/voice/victory.' + TETRIS.audioExt,
 
                 /* IMAGES */
                 'preload!images/fire/warthog_fire_1.png',
@@ -66,7 +77,6 @@ window.addEventListener('load', function() {
                 'preload!scripts/random.js',
                 'preload!scripts/particleSystem.js',
                 'preload!scripts/render.js',
-                'preload!scripts/persistence.js',
                 'preload!scripts/input.js',
                 'preload!scripts/controls.js',
                 'preload!scripts/credits.js',
@@ -88,12 +98,17 @@ yepnope.addPrefix('preload', function(resource) {
     TETRIS.status.preloadRequest++;
 
     var isImage = /.+\.(jpg|png|gif)$/i.test(resource.url);
-    resource.noexec = isImage;
+    var isSound = /.+\.(mp3|wav)$/i.test(resource.url);
+    resource.noexec = (isImage || isSound);
     resource.autoCallback = function(e) {
         if(isImage) {
             var image = new Image();
             image.src = resource.url;
             TETRIS.images[resource.url] = image;
+        } else if(isSound) {
+            var sound = new Audio(resource.url);
+            console.log('Adding sound: ' + resource.url);
+            TETRIS.sounds[resource.url] = sound;
         }
         TETRIS.status.preloadComplete++;
 

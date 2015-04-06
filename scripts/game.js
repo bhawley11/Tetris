@@ -173,7 +173,7 @@ TETRIS.screens['game'] = (function() {
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
 
-        TETRIS.menuMusic.pause();
+        TETRIS.sounds['sounds/music/title_theme.' + TETRIS.audioExt].pause();
         TETRIS.lastTime = performance.now();
 
         TETRIS.keyboard.clearKeyboardState();
