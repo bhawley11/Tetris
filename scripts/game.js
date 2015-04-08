@@ -7,10 +7,13 @@ TETRIS.screens['game'] = (function() {
 
     var cancelNextRequest = false,
         gameOver = false,
+        gainedTheLead = false,
+        firstStrike = false,
 
         currentShape = null,
         shapeOnDeckImage = null,
         gameBoard = null,
+        voice = null,
 
         playScreen = null,
         scoreBoard = null,
@@ -32,7 +35,7 @@ TETRIS.screens['game'] = (function() {
         speed,
         linesCleared,
         linesToNextDiff = 0,
-        particleStartIndexes = [];
+        deletedIndexes = [];
 
 
     function beginGameMusic() {
@@ -54,9 +57,6 @@ TETRIS.screens['game'] = (function() {
 
         TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
             TETRIS.onGameScreen = false;
-            if(TETRIS.grid != null){
-                TETRIS.grid.clearGrid();
-            }
             cancelNextRequest = true;
             TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
             TETRIS.main.showScreen('menu');
@@ -143,6 +143,18 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
+    function inHistory(shape){
+        var i = 0;
+        for(i; i < shapeHistory.length; i++){
+            if(shape === shapeHistory[i]){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     function render() {
         TETRIS.graphics.clear();
         playScreen.draw();
@@ -155,6 +167,7 @@ TETRIS.screens['game'] = (function() {
             shapeOnDeckImage.draw();
         }
     }
+
 
     function nextShape(){
         var i = 0,
@@ -175,19 +188,9 @@ TETRIS.screens['game'] = (function() {
         return randomChoice;
     }
 
-    function inHistory(shape){
-        var i = 0;
-        for(i; i < shapeHistory.length; i++){
-            if(shape === shapeHistory[i]){
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     function playRowDeleteVoiceEffect(numDeleted) {
-        var voice = null;
+        voice = null;
 
         switch(numDeleted) {
             case 2:
@@ -229,6 +232,11 @@ TETRIS.screens['game'] = (function() {
     function run() {
         var nextShapeSpec;
 
+        if(TETRIS.sessionID != null) {
+            cancelAnimationFrame(TETRIS.sessionID);
+            TETRIS.sessionID = null;
+        }
+
         multiplier = 1;
         score = 0;
         level = 1;
@@ -238,7 +246,7 @@ TETRIS.screens['game'] = (function() {
         pointsForFourLines = 1200;
         speed = .75;
         linesCleared = 0;
-        particleStartIndexes.length = 0;
+        deletedIndexes.length = 0;
         gameOver = false;
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
@@ -251,24 +259,11 @@ TETRIS.screens['game'] = (function() {
 
         beginGameMusic();
 
-        if(TETRIS.sessionID != null) {
-            cancelAnimationFrame(TETRIS.sessionID);
-            TETRIS.sessionID = null;
-        }
-
         for(var i = 0; i < 4; i++) {
             shapeHistory.push('LZ');
         }
 
-        $.ajax({
-            url: 'http://localhost:3000/v1/high-scores',
-            cache : false,
-            type: 'GET',
-            error: function() {alert('GET failed');},
-            success: function(data){
-                topScore = data[0].score;
-            }
-        });
+        serverCallHighScore();
 
         gameBoard = TETRIS.objects.GameBoard();
         gameBoard.createGameBoard();
@@ -290,13 +285,31 @@ TETRIS.screens['game'] = (function() {
     }
 
 
+    function serverCallHighScore() {
+        $.ajax({
+            url: 'http://localhost:3000/v1/high-scores',
+            cache : false,
+            type: 'GET',
+            error: function() {alert('GET failed');},
+            success: function(data){
+                topScore = data[0].score;
+            }
+        });
+    }
+
+
     function update() {
         var linesDeletedThisUpdate = 0,
             nextShapeSpec,
-            soundEffect = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt];
+            name = '',
+            soundEffect = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt],
+            ticBeforeAnimation = 0;
+
+        soundEffect.volume = .25;
+        voice = TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt];
 
         if(gameOver){
-            var name = prompt("Please enter your name", "Chief");
+            name = prompt("Please enter your name", "Chief");
 
             if(name === '' || name === null){
                 name = 'Unknown';
@@ -311,34 +324,26 @@ TETRIS.screens['game'] = (function() {
         else{
             if(ticTime/1000 > speed) {
                 if (!currentShape.softDrop(gameBoard)) {
-                    particleStartIndexes = 0;
+                    deletedIndexes = 0;
+
+                    ticBeforeAnimation = ticTime;
 
                    do {
-                        particleStartIndexes = gameBoard.checkForCompleteLines();
-                        beginEffect(particleStartIndexes,gameBoard);
-                        gameBoard.deleteLines(particleStartIndexes, gameBoard);
+                        deletedIndexes = gameBoard.checkForCompleteLines();
+                        beginEffect(deletedIndexes,gameBoard);
+                        gameBoard.deleteLines(deletedIndexes, gameBoard);
+
                         gameBoard.fillIn(gameBoard);
 
-                       if(particleStartIndexes.length != 0){
-                           if(particleStartIndexes.length === 1){
-                               score += multiplier * pointsForOneLine;
-                           }
-                           else if(particleStartIndexes.length === 2){
-                               score += multiplier * pointsForTwoLines;
-                           }
-                           else if(particleStartIndexes.length === 3){
-                               score += multiplier * pointsForThreeLines;
-                           }
-                           else{
-                               score += multiplier * pointsForFourLines;
-                           }
-                       }
+                        updateScore(deletedIndexes.length);
 
-                       linesDeletedThisUpdate += particleStartIndexes.length;
-                       linesCleared += particleStartIndexes.length;
-                       linesToNextDiff += particleStartIndexes.length;
+                       linesDeletedThisUpdate += deletedIndexes.length;
+                       linesCleared += deletedIndexes.length;
+                       linesToNextDiff += deletedIndexes.length;
 
-                    } while(particleStartIndexes.length > 0);
+                    } while(deletedIndexes.length > 0);
+
+                    ticTime = ticBeforeAnimation;
 
                     if(linesDeletedThisUpdate === 0) {
                         soundEffect.play();
@@ -373,16 +378,59 @@ TETRIS.screens['game'] = (function() {
                             width: nextShapeSpec.width, height: nextShapeSpec.height
                         });
                     } else {
+                        TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt].play();
                         gameOver = true;
                     }
                 }
                 score++;
-                particleStartIndexes.length = 0;
+
+                if(voice !== null) {
+                    voice.addEventListener('ended', function () {
+                        if (!gainedTheLead && score > topScore) {
+                            gainedTheLead = true;
+                            TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                        }
+
+                        if (!firstStrike && deletedIndexes.length === 0) {
+                            firstStrike = true;
+                            TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt].play();
+                        }
+                    });
+                } else {
+                    if (!gainedTheLead && score > topScore) {
+                        gainedTheLead = true;
+                        TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                    }
+
+                    if (!firstStrike && deletedIndexes.length === 0) {
+                        firstStrike = true;
+                        TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt].play();
+                    }
+                }
+
+                deletedIndexes.length = 0;
                 ticTime = 0;
             }
             TETRIS.keyboard.update(TETRIS.elapsedTime);
         }
         updateScoreBoard();
+    }
+
+    function updateScore(amountOfRows) {
+        if(amountOfRows != 0){
+            if(amountOfRows === 1){
+                score += multiplier * pointsForOneLine;
+            }
+            else if(amountOfRows === 2){
+                score += multiplier * pointsForTwoLines;
+            }
+            else if(amountOfRows === 3){
+                score += multiplier * pointsForThreeLines;
+            }
+            else{
+                score += multiplier * pointsForFourLines;
+            }
+        }
     }
 
     function updateScoreBoard(){
