@@ -22,7 +22,6 @@ fs.readFile('score.txt', 'utf8', function(err, data){
                         console.log("Couldn't fill file with default content!");
                     }
                     else{
-
                         var highScoreArray = defaultContent.split('-');
                         for (var i = 0; i < highScoreArray.length; i++) {
                             var newRecord = highScoreArray[i].split("/");
@@ -45,18 +44,6 @@ fs.readFile('score.txt', 'utf8', function(err, data){
             scores[i].score = newRecord[1];
         }
     }
-});
-
-fs.readFile('score.txt', 'utf8', function(err, data){
-   if(!err) {
-       var highScoreArray = data.split('-');
-       for (var i = 0; i < highScoreArray.length; i++) {
-           var newRecord = highScoreArray[i].split("/");
-           scores.push({});
-           scores[i].name = newRecord[0];
-           scores[i].score = newRecord[1];
-       }
-   }
 });
 
 function sortScores(){
