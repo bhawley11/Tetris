@@ -155,7 +155,28 @@ TETRIS.screens['controls'] = (function() {
                 {keyCode : 33, icon: 'page up'},
                 {keyCode : 34, icon: 'page down'},
                 {keyCode : 36, icon: 'home'},
-                {keyCode : 35, icon: 'end'}
+                {keyCode : 35, icon: 'end'},
+                {keyCode : 19, icon: 'pause/break'},
+                {keyCode : 45, icon: 'insert'},
+                {keyCode : 46, icon: 'delete'},
+                {keyCode : 96, icon: 'numpad 0'},
+                {keyCode : 97, icon: 'numpad 1'},
+                {keyCode : 98, icon: 'numpad 2'},
+                {keyCode : 99, icon: 'numpad 3'},
+                {keyCode : 100, icon: 'numpad 4'},
+                {keyCode : 101, icon: 'numpad 5'},
+                {keyCode : 102, icon: 'numpad 6'},
+                {keyCode : 103, icon: 'numpad 7'},
+                {keyCode : 104, icon: 'numpad 8'},
+                {keyCode : 105, icon: 'numpad 9'},
+                {keyCode : 106, icon: 'numpad mulitply'},
+                {keyCode : 107, icon: 'numpad add'},
+                {keyCode : 109, icon: 'numpad subtract'},
+                {keyCode : 110, icon: 'numpad decimal'},
+                {keyCode : 111, icon: 'numpad divide'},
+                {keyCode : 93, icon: 'numpad select'},
+                {keyCode : 144, icon: 'num lock'},
+                {keyCode : 145, icon: 'scroll lock'}
             ];
     }
 
