@@ -5,8 +5,11 @@
 TETRIS.screens['highScores'] = (function() {
     'use strict';
 
+    var gameMusic = TETRIS.sounds['sounds/music/promise_the_girl.' + TETRIS.audioExt];
+
     function init() {
         document.getElementById('highScores-back').addEventListener('click', function () {
+            TETRIS.sounds['sounds/music/promise_the_girl.' + TETRIS.audioExt].pause();
             TETRIS.main.showScreen('menu');
         }, false);
     }
@@ -43,6 +46,19 @@ TETRIS.screens['highScores'] = (function() {
     }
 
     function run() {
+
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+        gameMusic.currentTime = 0;
+        gameMusic.volume = .05;
+        if(gameMusic === undefined || gameMusic.paused) {
+            gameMusic.addEventListener('ended', function () {
+                gameMusic.currentTime = 0;
+                gameMusic.play();
+            }, false);
+            gameMusic.play();
+        }
+
         showScores();
     }
 

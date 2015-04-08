@@ -33,8 +33,11 @@ window.addEventListener('load', function() {
             load : [
                 /* SOUNDS */
                 /* sound are causing an unhandled exception ILLEGAL TOKEN */
-                'preload!sounds/music/game_theme.' + TETRIS.audioExt,
-                'preload!sounds/music/title_theme.' + TETRIS.audioExt,
+                'preload!sounds/music/ascendancy_remix.' + TETRIS.audioExt,
+                'preload!sounds/music/unsullied_memory.' + TETRIS.audioExt,
+                'preload!sounds/music/africa_suite.' + TETRIS.audioExt,
+                'preload!sounds/music/promise_the_girl.' + TETRIS.audioExt,
+                'preload!sounds/music/unwearied_heart.' + TETRIS.audioExt,
                 'preload!sounds/voice/victory.' + TETRIS.audioExt,
                 'preload!sounds/effects/boltshot_shot.' + TETRIS.audioExt,
                 'preload!sounds/effects/br_scope_in.' + TETRIS.audioExt,

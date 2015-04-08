@@ -8,10 +8,13 @@ TETRIS.screens['controls'] = (function() {
             {key : 'E', id: 'right-rotate-control', value:KeyEvent.DOM_VK_E},{key : 'S', id: 'soft-drop-control',value:KeyEvent.DOM_VK_S},{key : 'X', id:'hard-drop-control', value:KeyEvent.DOM_VK_X}],
         newKeyCode,
         newKeyChar,
-        KeyCodes = {};
+        KeyCodes = {},
+        gameMusic = TETRIS.sounds['sounds/music/africa_suite.' + TETRIS.audioExt];
 
     function init() {
         document.getElementById('controls-back').addEventListener('click', function () {
+            gameMusic.pause();
+            gameMusic.currentTime = 0;
             TETRIS.main.showScreen('menu');
         }, false);
         setKeys();
@@ -116,9 +119,30 @@ TETRIS.screens['controls'] = (function() {
         }
     }
 
+
+    function beginControlsMusic() {
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+        gameMusic.currentTime = 0;
+        gameMusic.volume = .05;
+        if(gameMusic === undefined || gameMusic.paused) {
+            gameMusic.addEventListener('ended', function () {
+                gameMusic.currentTime = 0;
+                gameMusic.play();
+            }, false);
+            gameMusic.play();
+        }
+    }
+
+
     function run() {
         var i = 0;
         var node;
+
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+        beginControlsMusic();
+
+
         displayUserControls();
         for(i; i < arrayID.length; i++)
         {

@@ -36,7 +36,7 @@ TETRIS.screens['game'] = (function() {
 
 
     function beginGameMusic() {
-        var gameMusic = TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt];
+        var gameMusic = TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt];
         gameMusic.currentTime = 0;
         gameMusic.volume = .05;
         if(gameMusic === undefined || gameMusic.paused) {
@@ -58,7 +58,7 @@ TETRIS.screens['game'] = (function() {
                 TETRIS.grid.clearGrid();
             }
             cancelNextRequest = true;
-            TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt].pause();
+            TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
             TETRIS.main.showScreen('menu');
         });
 
@@ -243,7 +243,8 @@ TETRIS.screens['game'] = (function() {
         TETRIS.onGameScreen = true;
         cancelNextRequest = false;
 
-        TETRIS.sounds['sounds/music/title_theme.' + TETRIS.audioExt].pause();
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
         TETRIS.lastTime = performance.now();
 
         TETRIS.keyboard.clearKeyboardState();
@@ -303,7 +304,7 @@ TETRIS.screens['game'] = (function() {
             TETRIS.screens['highScores'].addScore(name, score);
             TETRIS.onGameScreen = false;
 
-            TETRIS.sounds['sounds/music/game_theme.' + TETRIS.audioExt].pause();
+            TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
             cancelNextRequest = true;
             TETRIS.main.showScreen('menu');
         }
@@ -426,6 +427,7 @@ TETRIS.screens['game'] = (function() {
 
     function hardDrop(){
         score += currentShape.hardDrop(gameBoard);
+        ticTime = speed * 1000 + 1;
     }
 
     function softDrop(){
