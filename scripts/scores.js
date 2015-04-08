@@ -4,6 +4,8 @@
 var fs = require('fs'),
     scores = [];
 
+
+
 fs.readFile('score.txt', 'utf8', function(err, data){
     if(err){
         console.log("Error reading from file!");
@@ -14,12 +16,28 @@ fs.readFile('score.txt', 'utf8', function(err, data){
             }
             else{
                 console.log("File create successfully!");
+                var defaultContent = 'NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0-NORECORD/0';
+                fs.appendFile('score.txt',defaultContent,function(err){
+                    if(err){
+                        console.log("Couldn't fill file with default content!");
+                    }
+                    else{
+                        var highScoreArray = defaultContent.split('-');
+                        for (var i = 0; i < highScoreArray.length; i++) {
+                            var newRecord = highScoreArray[i].split("/");
+                            scores.push({});
+                            scores[i].name = newRecord[0];
+                            scores[i].score = newRecord[1];
+                        }
+                        console.log("Filled File with default content!");
+                    }
+                } )
             }
         })
     }
     else{
         var highScoreArray = data.split('-');
-        for(var i = 0; i < highScoreArray.length; i++){
+        for (var i = 0; i < highScoreArray.length; i++) {
             var newRecord = highScoreArray[i].split("/");
             scores.push({});
             scores[i].name = newRecord[0];

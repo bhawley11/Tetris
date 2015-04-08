@@ -37,8 +37,7 @@ TETRIS.screens['game'] = (function() {
         speed,
         linesCleared,
         linesToNextDiff = 0,
-        deletedIndexes = [],
-        numDeletedForVoice = 0;
+        deletedIndexes = [];
 
 
     function beginGameMusic() {
@@ -257,6 +256,11 @@ TETRIS.screens['game'] = (function() {
 
 
     function returnToMain(name) {
+        name = prompt("Please enter your name", "Chief");
+
+        if(name === '' || name === null){
+            name = 'Unknown';
+        }
         TETRIS.screens['highScores'].addScore(name, score);
         TETRIS.onGameScreen = false;
 
