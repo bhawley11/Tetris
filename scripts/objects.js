@@ -153,7 +153,8 @@ TETRIS.objects = function () {
 
         that.hardDrop = function (gameBoard) {
             var able = true,
-                doneOnce = false;
+                doneOnce = false,
+                drops = 0;
 
             if(spawned) {
                 do {
@@ -161,10 +162,11 @@ TETRIS.objects = function () {
 
                     if(able) {
                         doneOnce = true;
+                        drops++;
                     }
                 } while (able);
-                return doneOnce;
-            } else return false;
+            }
+            return drops;
         };
 
 
