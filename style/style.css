@@ -182,8 +182,8 @@ ul {
 
 #credits-back {
     position: relative;
-    top: 500px;
-    left: 415px;
+    margin-top: 40px;
+    left: 398px;
 }
 
 #highScores-title {
@@ -225,6 +225,7 @@ ul {
 #credits-cb {
     color: #ffab0f;
     text-align: center;
+    margin-top:50px;
 }
 
 #bgh, #srh{
@@ -232,6 +233,14 @@ ul {
     margin-right: auto;
     width: 400px;
     font-size: 30px;
+}
+
+#bgh {
+    text-align:right;
+}
+
+#srh{
+    text-align:left;
 }
 
 #jdm {

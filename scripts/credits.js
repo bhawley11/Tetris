@@ -6,12 +6,7 @@ TETRIS.screens['credits'] = (function() {
     'use strict';
 
     function init() {
-        //document.getElementById('credits-back').addEventListener('click', function () {
-        //    TETRIS.main.showScreen('menu');
-        //}, false);
-
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
-            console.log('working');
+        document.getElementById('credits-back').addEventListener('click', function () {
             TETRIS.main.showScreen('menu');
         }, false);
     }
