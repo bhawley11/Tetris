@@ -298,7 +298,7 @@ TETRIS.screens['game'] = (function() {
         if(gameOver){
             var name = prompt("Please enter your name", "Chief");
 
-            if(name === ''){
+            if(name === '' || name === null){
                 name = 'Unknown';
             }
             TETRIS.screens['highScores'].addScore(name, score);
