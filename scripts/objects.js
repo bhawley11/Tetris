@@ -833,6 +833,21 @@ TETRIS.objects = function () {
         };
 
 
+        that.cloneGrid = function() {
+          var i = 0,
+              j = 0,
+              clonedGrid = [[]];
+            for (i = 0; i < 10; ++i) {
+                if (!clonedGrid[i]) clonedGrid[i] = [];
+                for (j = 0; j < 22; ++j) {
+                    clonedGrid[i][j] = grid[i][j];
+                }
+            }
+
+            return clonedGrid;
+        };
+
+
         that.createGameBoard = function () {
             var columns = 10,
                 rows = 22,
