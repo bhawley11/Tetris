@@ -37,7 +37,8 @@ TETRIS.screens['game'] = (function() {
         speed,
         linesCleared,
         linesToNextDiff = 0,
-        deletedIndexes = [];
+        deletedIndexes = [],
+        numDeletedForVoice = 0;
 
 
     function beginGameMusic() {
