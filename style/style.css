@@ -82,6 +82,14 @@ ul {
     margin-top: 23px;
 }
 
+.controls-box :hover {
+    color: #ffab0f;
+}
+
+.controls-box :focus{
+    color: #ffab0f;
+}
+
 .float-left {
     float: left;
 }
@@ -168,12 +176,106 @@ ul {
 
 #highScores-back {
     position: relative;
-    top: 500px;
-    left: 385px;
+    top: 80px;
+    left: 415px;
 }
 
 #credits-back {
     position: relative;
     top: 500px;
-    left: 385px;
+    left: 415px;
+}
+
+#highScores-title {
+    width: 250px;
+    position: relative;
+    left: 398px;
+    color: #35CAFF;
+    padding-top: 43px;
+    margin-bottom: -65px;
+}
+
+#highScores-divList{
+    position: relative;
+    top: 55px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: -22px;
+    text-align: left;
+}
+
+#highScores-divList li{
+    font-size: 20px;
+    padding-top: 21px;
+    color: #35caff;
+    text-align: center;
+}
+
+#highScores-divList ol{
+    list-style: none;
+}
+
+#credits-title {
+    color: #35CAFF;
+    text-align:center;
+    margin-top: 43px;
+    margin-bottom: 43px;
+}
+
+#credits-cb {
+    color: #ffab0f;
+    text-align: center;
+}
+
+#bgh, #srh{
+    margin-left : auto;
+    margin-right: auto;
+    width: 400px;
+    font-size: 30px;
+}
+
+#jdm {
+    margin-left:auto;
+    margin-right:auto;
+    width:auto;
+    clear:both;
+    font-size:25px;
+}
+
+.name {
+    color: #a6f1ff;
+    text-align: center;
+}
+
+#credits-whb {
+    color: #ffab0f;
+    clear:both;
+    text-align:center;
+    margin-top: 110px;
+    margin-bottom: 43px;
+}
+
+#credits-spt {
+    color:#ffab0f;
+    text-align:center;
+    margin-top: 60px;
+    margin-bottom: 24px;
+}
+
+#credits-and{
+    color:#ffab0f;
+    text-align:center;
+}
+
+#credits-343-image{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#credits-source-list{
+    color: #35caff;
+    text-align: center;
 }
