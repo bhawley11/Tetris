@@ -54,7 +54,7 @@ window.addEventListener('load', function() {
                 'preload!sounds/voice/killtastrophe.' + TETRIS.audioExt,
                 'preload!sounds/voice/killpocalypse.' + TETRIS.audioExt,
                 'preload!sounds/voice/killionaire.' + TETRIS.audioExt,
-                'preload!sounds/voice/gain_the_lead.' + TETRIS.audioExt,
+                'preload!sounds/voice/gained_the_lead.' + TETRIS.audioExt,
                 'preload!sounds/voice/first_strike.' + TETRIS.audioExt,
                 'preload!sounds/voice/game_over.' + TETRIS.audioExt,
                 'preload!sounds/guns/assault_rifle_burst_1.' + TETRIS.audioExt,
