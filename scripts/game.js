@@ -9,11 +9,13 @@ TETRIS.screens['game'] = (function() {
         gameOver = false,
         gainedTheLead = false,
         firstStrike = false,
+        deletedSomething = false,
 
         currentShape = null,
         shapeOnDeckImage = null,
         gameBoard = null,
         voice = null,
+        gunNoise = TETRIS.sounds['sounds/guns/assault_rifle_burst_1.' + TETRIS.audioExt],
 
         playScreen = null,
         scoreBoard = null,
@@ -35,7 +37,8 @@ TETRIS.screens['game'] = (function() {
         speed,
         linesCleared,
         linesToNextDiff = 0,
-        deletedIndexes = [];
+        deletedIndexes = [],
+        numDeletedForVoice = 0;
 
 
     function beginGameMusic() {
@@ -155,17 +158,27 @@ TETRIS.screens['game'] = (function() {
     }
 
 
-    function render() {
-        TETRIS.graphics.clear();
-        playScreen.draw();
-        scoreBoard.draw();
-        theHog.draw();
+    function namePrompt() {
+        var name;
 
-        TETRIS.graphics.drawGrid(gameBoard.getGrid());
+        name = prompt("Please enter your name", "Chief");
 
-        if (shapeOnDeckImage !== null) {
-            shapeOnDeckImage.draw();
+        if(name === ''){
+            name = 'Unknown';
         }
+
+        return name;
+    }
+
+
+    function nextLevel() {
+        speed = speed - .10;
+        multiplier += 1;
+        level += 1;
+        if(speed < 0){
+            speed = .10;
+        }
+        linesToNextDiff = 0;
     }
 
 
@@ -226,7 +239,36 @@ TETRIS.screens['game'] = (function() {
             voice.currentTime = 0;
             voice.play();
         }
-    };
+    }
+
+
+    function render() {
+        TETRIS.graphics.clear();
+        playScreen.draw();
+        scoreBoard.draw();
+        theHog.draw();
+
+        TETRIS.graphics.drawGrid(gameBoard.getGrid());
+
+        if (shapeOnDeckImage !== null) {
+            shapeOnDeckImage.draw();
+        }
+    }
+
+
+    function returnToMain(name) {
+        name = prompt("Please enter your name", "Chief");
+
+        if(name === '' || name === null){
+            name = 'Unknown';
+        }
+        TETRIS.screens['highScores'].addScore(name, score);
+        TETRIS.onGameScreen = false;
+
+        TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
+        cancelNextRequest = true;
+        TETRIS.main.showScreen('menu');
+    }
 
 
     function run() {
@@ -303,23 +345,15 @@ TETRIS.screens['game'] = (function() {
             nextShapeSpec,
             name = '',
             soundEffect = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt],
+            firstStrikeVoice = TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt],
             ticBeforeAnimation = 0;
 
         soundEffect.volume = .25;
-        voice = TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt];
+        voice = TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt];
 
         if(gameOver){
-            name = prompt("Please enter your name", "Chief");
-
-            if(name === '' || name === null){
-                name = 'Unknown';
-            }
-            TETRIS.screens['highScores'].addScore(name, score);
-            TETRIS.onGameScreen = false;
-
-            TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
-            cancelNextRequest = true;
-            TETRIS.main.showScreen('menu');
+            name = namePrompt();
+            returnToMain(name);
         }
         else{
             if(ticTime/1000 > speed) {
@@ -329,13 +363,13 @@ TETRIS.screens['game'] = (function() {
                     ticBeforeAnimation = ticTime;
 
                    do {
-                        deletedIndexes = gameBoard.checkForCompleteLines();
-                        beginEffect(deletedIndexes,gameBoard);
-                        gameBoard.deleteLines(deletedIndexes, gameBoard);
+                       deletedIndexes = gameBoard.checkForCompleteLines();
+                       beginEffect(deletedIndexes,gameBoard);
+                       gameBoard.deleteLines(deletedIndexes, gameBoard);
 
-                        gameBoard.fillIn(gameBoard);
+                       gameBoard.fillIn(gameBoard);
 
-                        updateScore(deletedIndexes.length);
+                       updateScore(deletedIndexes.length);
 
                        linesDeletedThisUpdate += deletedIndexes.length;
                        linesCleared += deletedIndexes.length;
@@ -348,18 +382,13 @@ TETRIS.screens['game'] = (function() {
                     if(linesDeletedThisUpdate === 0) {
                         soundEffect.play();
                     } else {
-                        console.log(linesDeletedThisUpdate);
-                        playRowDeleteVoiceEffect(linesDeletedThisUpdate);
+                        numDeletedForVoice = linesDeletedThisUpdate;
+                        deletedSomething = true;
+                        gunNoise.play();
                     }
 
                     if(linesToNextDiff >= 10){
-                        speed = speed - .10;
-                        multiplier += 1;
-                        level += 1;
-                        if(speed < 0){
-                            speed = .10;
-                        }
-                        linesToNextDiff = 0;
+                        nextLevel();
                     }
 
                     currentShape = TETRIS.objects.Shape();
@@ -384,29 +413,40 @@ TETRIS.screens['game'] = (function() {
                 }
                 score++;
 
-                if(voice !== null) {
-                    voice.addEventListener('ended', function () {
-                        if (!gainedTheLead && score > topScore) {
-                            gainedTheLead = true;
-                            TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                        }
+                firstStrikeVoice.addEventListener('ended', function() {
+                   if(!gainedTheLead && score > topScore) {
+                       gainedTheLead = true;
+                       TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                   }
+                });
 
-                        if (!firstStrike && deletedIndexes.length === 0) {
-                            firstStrike = true;
-                            TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt].play();
-                        }
-                    });
-                } else {
-                    if (!gainedTheLead && score > topScore) {
+                voice.addEventListener('ended', function () {
+                    if(!firstStrike) {
+                        firstStrike = true;
+                        firstStrikeVoice.play();
+                    }
+                    else if(!gainedTheLead && score > topScore) {
                         gainedTheLead = true;
                         TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
                     }
+                });
 
-                    if (!firstStrike && deletedIndexes.length === 0) {
-                        firstStrike = true;
-                        TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt].play();
+                gunNoise.addEventListener('ended', function () {
+                    if(deletedSomething) {
+                        playRowDeleteVoiceEffect(numDeletedForVoice);
+                        deletedSomething = false;
+                        numDeletedForVoice = 0;
+                    } else {
+                        if(!firstStrike) {
+                            firstStrike = true;
+                            firstStrikeVoice.play();
+                        }
+                        else if(!gainedTheLead && score > topScore) {
+                            gainedTheLead = true;
+                            TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                        }
                     }
-                }
+                });
 
                 deletedIndexes.length = 0;
                 ticTime = 0;
