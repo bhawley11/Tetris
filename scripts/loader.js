@@ -104,6 +104,8 @@ window.addEventListener('load', function() {
                 'preload!scripts/input.js',
                 'preload!scripts/controls.js',
                 'preload!scripts/credits.js',
+                'preload!scripts/AInextMove.js',
+                'preload!scripts/AIgame.js',
                 'preload!scripts/game.js',
                 'preload!scripts/highScores.js',
                 'preload!scripts/menu.js',

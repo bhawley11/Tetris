@@ -135,6 +135,21 @@ TETRIS.objects = function () {
             that.setUpShapeBoundaries();
         };
 
+        that.getLowerLeftLocation = function(){
+            var amountOfPieces = pieces.length,
+                currentPiece = null,
+                i = 0;
+
+            for(i; i < amountOfPieces; i++){
+                currentPiece = pieces[i];
+                if(currentPiece.getIsLeft()){
+                    if(currentPiece.getIsBottom()){
+                        return currentPiece.getLocation();
+                    }
+                }
+            }
+        };
+
 
         that.getPieces = function () {
             return (pieces.length > 0) ? pieces : null;
@@ -150,6 +165,9 @@ TETRIS.objects = function () {
             return spawned;
         };
 
+        that.getRotationState = function(){
+            return currentRotationState;
+        };
 
         that.hardDrop = function (gameBoard) {
             var able = true,
@@ -221,6 +239,10 @@ TETRIS.objects = function () {
         that.removePiece = function (piece) {
             var indexOf = pieces.indexOf(piece);
             pieces.splice(indexOf, 1);
+        };
+
+        that.getRotateState = function(){
+          return currentRotationState;
         };
 
 
@@ -798,6 +820,26 @@ TETRIS.objects = function () {
             that.createGameBoard();
         };
 
+        that.returnBumpiness = function(){
+           var list = that.getHeights(),
+               i = 0,
+               j = 0,
+               summedList = [],
+               bumpiness = 0;
+
+            for(i; i < list.length; i++){
+                if(i + 1 == list.length){
+                    break;
+                }
+                summedList.push(list[i] - list[i+1]);
+            }
+
+            for(j; j < summedList.length; j++){
+                bumpiness += summedList[j];
+            }
+            return bumpiness;
+        };
+
 
         that.checkForCompleteLines = function () {
             var everyCellEmpty = true,
@@ -832,6 +874,71 @@ TETRIS.objects = function () {
             return listOfFullRowIndexes;            // We will return the list of indexes for scoring and particle effects
         };
 
+        that.returnCompletedLines = function(){
+            var everyCellEmpty = true,
+                everyCellFull = true,
+                tempLocation = null,
+                count = 0,
+                y= 21,
+                x = 0;
+
+            for(y = 21; y >= 0; --y) {
+                everyCellEmpty = true;
+                everyCellFull = true;
+
+                for(x = 0; x < 10; ++x) {
+                    tempLocation = { x : x, y : y };
+
+                    if(that.isEmpty(tempLocation)) {
+                        everyCellFull = false;
+                    } else {
+                        everyCellEmpty = false;
+                    }
+                }
+
+                if(everyCellEmpty) {
+                    break;
+                }
+
+                if(everyCellFull) {
+                    count++;
+                }
+            }
+            return count;
+        };
+
+        that.returnHoles = function(){
+            var x = 0,
+                y = 0,
+                count = 0,
+                beginCount = false;
+
+            for(y; y < 22; y++){
+                for(x; x < 10; x++){
+                    if(!that.isEmpty({x:x, y:y})){
+                        beginCount = true;
+                    }
+                    if(that.isEmpty({x:x, y:y})){
+                        if(beginCount){
+                            count++;
+                        }
+                    }
+                }
+            }
+            return count;
+        };
+
+        that.cloneEverything = function(board){
+            var amountOfShapes = currentShapes.length,
+                i = 0,
+                needShapes = [];
+
+            grid = board.cloneGrid();
+            needShapes = board.getShapes();
+            for(i; i < amountOfShapes; i++){
+                currentShapes[i] = needShapes[i];
+            }
+        };
 
         that.cloneGrid = function() {
           var i = 0,
@@ -845,6 +952,17 @@ TETRIS.objects = function () {
             }
 
             return clonedGrid;
+        };
+
+        that.returnAggregateHeight = function(){
+            var list = that.getHeights(),
+                count = 0,
+                i;
+
+            for(i = 0; i < list.length(); i++){
+                count = count + list[i];
+            }
+            return count;
         };
 
 
@@ -862,6 +980,23 @@ TETRIS.objects = function () {
             }
 
             currentShapes.length = 0;
+        };
+
+        that.getHeights = function(){
+            var x = 0,
+                y = 0,
+                listOfHeights = [];
+
+            for(x; x < 10; x++){
+                for(y; y < 22; y++){
+                    if(!that.isEmpty({x:x, y:y})){
+                        var temp = 22 - y;
+                        listOfHeights.push(temp);
+                        break;
+                    }
+                }
+            }
+
         };
 
 
@@ -941,6 +1076,10 @@ TETRIS.objects = function () {
 
         that.getGrid = function () {
             return grid;
+        };
+
+        that.getShapes = function() {
+            return currentShapes;
         };
 
 
