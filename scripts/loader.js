@@ -38,7 +38,6 @@ window.addEventListener('load', function() {
                 'preload!sounds/music/africa_suite.' + TETRIS.audioExt,
                 'preload!sounds/music/promise_the_girl.' + TETRIS.audioExt,
                 'preload!sounds/music/unwearied_heart.' + TETRIS.audioExt,
-                'preload!sounds/voice/victory.' + TETRIS.audioExt,
                 'preload!sounds/effects/boltshot_shot.' + TETRIS.audioExt,
                 'preload!sounds/effects/br_scope_in.' + TETRIS.audioExt,
                 'preload!sounds/effects/br_scope_out.' + TETRIS.audioExt,
@@ -78,6 +77,12 @@ window.addEventListener('load', function() {
 
                 'preload!images/backgrounds/delta_halo.jpg',
                 'preload!images/backgrounds/fud.jpg',
+                'preload!images/backgrounds/composer.png',
+                'preload!images/backgrounds/infinity.png',
+                'preload!images/backgrounds/midnight.png',
+                'preload!images/backgrounds/reclaimer.png',
+                'preload!images/backgrounds/requiem.png',
+                'preload!images/backgrounds/shutdown.png',
 
                 'preload!images/title.png',
 

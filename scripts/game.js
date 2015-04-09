@@ -179,6 +179,7 @@ TETRIS.screens['game'] = (function() {
             speed = .10;
         }
         linesToNextDiff = 0;
+        updateNextPieceBackground(level);
     }
 
 
@@ -202,7 +203,7 @@ TETRIS.screens['game'] = (function() {
     }
 
 
-    function playRowDeleteVoiceEffect(numDeleted) {
+    function playRowDeleteVoiceEffect(numDeleted, firstStrikeVoice) {
         voice = null;
 
         switch(numDeleted) {
@@ -235,9 +236,32 @@ TETRIS.screens['game'] = (function() {
                 break;
         }
 
+        firstStrikeVoice.addEventListener('ended', function() {
+            firstStrike = true;
+            if(!gainedTheLead && score > topScore) {
+                TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                gainedTheLead = true;
+            }
+        });
+
         if(voice !== null) {
+            voice.addEventListener('ended', function () {
+                deletedSomething = false;
+
+                if(!firstStrike) {
+                    firstStrikeVoice.play();
+                }
+                else if(!gainedTheLead && score > topScore) {
+                    gainedTheLead = true;
+                    TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
+                }
+            });
+
             voice.currentTime = 0;
             voice.play();
+        }
+        else if(!firstStrike) {
+            firstStrikeVoice.play();
         }
     }
 
@@ -300,6 +324,7 @@ TETRIS.screens['game'] = (function() {
         TETRIS.keyboard.clearKeyboardState();
 
         beginGameMusic();
+        updateNextPieceBackground(1);
 
         for(var i = 0; i < 4; i++) {
             shapeHistory.push('LZ');
@@ -360,8 +385,6 @@ TETRIS.screens['game'] = (function() {
                 if (!currentShape.softDrop(gameBoard)) {
                     deletedIndexes = 0;
 
-                    ticBeforeAnimation = ticTime;
-
                    do {
                        deletedIndexes = gameBoard.checkForCompleteLines();
                        beginEffect(deletedIndexes,gameBoard);
@@ -377,13 +400,13 @@ TETRIS.screens['game'] = (function() {
 
                     } while(deletedIndexes.length > 0);
 
-                    ticTime = ticBeforeAnimation;
-
                     if(linesDeletedThisUpdate === 0) {
                         soundEffect.play();
                     } else {
-                        numDeletedForVoice = linesDeletedThisUpdate;
-                        deletedSomething = true;
+                        if(linesDeletedThisUpdate > 1) {
+                            numDeletedForVoice = linesDeletedThisUpdate;
+                            deletedSomething = true;
+                        }
                         gunNoise.play();
                     }
 
@@ -413,32 +436,12 @@ TETRIS.screens['game'] = (function() {
                 }
                 score++;
 
-                firstStrikeVoice.addEventListener('ended', function() {
-                   if(!gainedTheLead && score > topScore) {
-                       gainedTheLead = true;
-                       TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                   }
-                });
-
-                voice.addEventListener('ended', function () {
-                    if(!firstStrike) {
-                        firstStrike = true;
-                        firstStrikeVoice.play();
-                    }
-                    else if(!gainedTheLead && score > topScore) {
-                        gainedTheLead = true;
-                        TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                    }
-                });
-
                 gunNoise.addEventListener('ended', function () {
                     if(deletedSomething) {
-                        playRowDeleteVoiceEffect(numDeletedForVoice);
-                        deletedSomething = false;
+                        playRowDeleteVoiceEffect(numDeletedForVoice, firstStrikeVoice);
                         numDeletedForVoice = 0;
                     } else {
                         if(!firstStrike) {
-                            firstStrike = true;
                             firstStrikeVoice.play();
                         }
                         else if(!gainedTheLead && score > topScore) {
@@ -455,6 +458,36 @@ TETRIS.screens['game'] = (function() {
         }
         updateScoreBoard();
     }
+
+
+    function updateNextPieceBackground(level) {
+        switch(level) {
+            case 1:
+                playScreen.changePieceBackground('images/backgrounds/fud.jpg');
+                break;
+            case 2:
+                playScreen.changePieceBackground('images/backgrounds/requiem.png');
+                break;
+            case 3:
+                playScreen.changePieceBackground('images/backgrounds/infinity.png');
+                break;
+            case 4:
+                playScreen.changePieceBackground('images/backgrounds/reclaimer.png');
+                break;
+            case 5:
+                playScreen.changePieceBackground('images/backgrounds/shutdown.png');
+                break;
+            case 6:
+                playScreen.changePieceBackground('images/backgrounds/composer.png');
+                break;
+            case 7:
+                playScreen.changePieceBackground('images/backgrounds/midnight.png');
+                break;
+            case 8:
+                break;
+        }
+    }
+
 
     function updateScore(amountOfRows) {
         if(amountOfRows != 0){

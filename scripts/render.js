@@ -139,6 +139,10 @@ TETRIS.graphics = (function() {
             ctx.restore();
         };
 
+        that.changeImage = function(img) {
+            spec.image = img;
+        };
+
         return that;
     }
 
