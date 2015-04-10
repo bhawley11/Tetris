@@ -548,6 +548,7 @@ TETRIS.objects = function () {
             spawned = true;
             if (that.checkSpawnLocation(gameBoard)) {
                 gameBoard.addShape(this);
+                return true;
             }
             else {
                 return false;
@@ -898,7 +899,7 @@ TETRIS.objects = function () {
             clone.createGameBoard();
             tempGrid = that.cloneGrid();
             clone.setGrid(tempGrid);
-            clone.setShapes(currentShapes);
+            clone.setShapes([]);
 
             return clone;
         };
@@ -909,15 +910,11 @@ TETRIS.objects = function () {
                 j = 0,
                 clonedGrid = [[]];
 
-            for(i = 0; i < 10; ++i) {
-                clonedGrid[i] = [];
-            }
-
             for (i = 0; i < 10; ++i) {
-                if (!grid[i]) grid[i] = [];
+                if (!clonedGrid[i]) clonedGrid[i] = [];
                 for (j = 0; j < 22; ++j) {
                     if(grid[i][j] !== null) {
-                        clonedGrid[i].push(grid[i][j]);
+                        clonedGrid[i][j] = 1;
                     } else {
                         clonedGrid[i][j] = null;
                     }

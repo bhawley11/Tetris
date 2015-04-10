@@ -750,7 +750,6 @@ TETRIS.screens['game'] = (function() {
 
         for(rot; rot < 4; ++rot) {
             rightsToMove = 0;
-            rightsMoved = 0;
 
             while(rightsToMove < 11) {
                 tempShape = cShape.clone(cShape.getShapeAbbrev());               // Reset the shape and clone it to the current shape
@@ -759,9 +758,10 @@ TETRIS.screens['game'] = (function() {
                 tempShape.spawn(tempBoard);
 
                 for (i; i < rot; ++i) {
-                    tempShape.rotate(gameBoard, 'r');
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                    tempShape.rotate(tempBoard, 'r');
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
                 }
-                lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
 
                 canMoveLeft = true;
                 canMoveRight = true;
@@ -771,7 +771,8 @@ TETRIS.screens['game'] = (function() {
                     lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
                 }
 
-                while (rightsMoved <= rightsToMove && canMoveRight) {
+                rightsMoved = 0;
+                while (rightsMoved < rightsToMove && canMoveRight) {
                     rightsMoved++;
                     canMoveRight = tempShape.moveRight(tempBoard);
                     lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
@@ -788,7 +789,8 @@ TETRIS.screens['game'] = (function() {
 
                 if (currentScore > best) {
                     best = currentScore;
-                    bestLocation = tempShape.getLowerLeftPieceLocation();
+                    var location = tempShape.getLowerLeftPieceLocation();
+                    bestLocation = { x : location.x, y : location.y } ;
                     bestRotation = tempShape.getCurrentRotationState();
                 }
                 else {
@@ -838,12 +840,14 @@ TETRIS.screens['game'] = (function() {
             j = 0,
             heights = [];
 
-        for(i; i < 10; ++i) {
-            for(j; j < 22; ++j) {
+        for(i = 0; i < 10; ++i) {
+            for(j = 0; j < 22; ++j) {
                 if(!gBoard.isEmpty({x : i, y : j})) {
                     heights.push(22 - j);
+                    break;
                 } else if(j == 21) {
                     heights.push(0);
+                    break;
                 }
             }
         }
