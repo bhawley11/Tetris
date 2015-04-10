@@ -679,7 +679,6 @@ TETRIS.screens['game'] = (function() {
             currentShape = TETRIS.objects.Shape();
             currentShape.createShape(abbrevForNextShape);
             TETRIS.pieceActive = true;
-            console.log(gameBoard.getShapes().length);
 
             TETRIS.bestDetails = getBestLocation(gameBoard, currentShape);
 
@@ -768,16 +767,26 @@ TETRIS.screens['game'] = (function() {
                 canMoveLeft = true;
                 canMoveRight = true;
 
-                while (canMoveLeft) {          // Move the shape left or right until it lines up with the last left it was at (we will want to increment it by one)
-                    canMoveLeft = tempShape.moveLeft(tempBoard);
-                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                while (true) {          // Move the shape left or right until it lines up with the last left it was at (we will want to increment it by one)
+                    if(!tempShape.moveLeft(tempBoard)) {
+                        break;
+                    } else {
+                        lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                    }
                 }
 
                 rightsMoved = 0;
-                while (rightsMoved < rightsToMove && canMoveRight) {
-                    rightsMoved++;
-                    canMoveRight = tempShape.moveRight(tempBoard);
-                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                while (true) {
+                    if(rightsMoved < rightsToMove) {
+                        if(!tempShape.moveRight(tempBoard)) {
+                            break;
+                        } else {
+                            rightsMoved++;
+                            lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                        }
+                    } else {
+                        break;
+                    }
                 }
 
                 do {                                                    // Move shape down until it can't go anymore
@@ -799,7 +808,6 @@ TETRIS.screens['game'] = (function() {
                     currentScore = 0;
                 }
                 rightsToMove++;
-                tempBoard.clearGrid();
             }
         }
 
