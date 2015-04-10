@@ -166,7 +166,7 @@ TETRIS.objects = function () {
                 location = null,
                 lowerLefts = [],
                 lowestLeft,
-                lowestY = 23,
+                lowestY = 0,
                 i = 0;
 
             for(i = 0; i < amtOfPieces; ++i) {
@@ -183,7 +183,7 @@ TETRIS.objects = function () {
             for(i = 0; i < lowerLefts.length; ++i) {
                 currentPiece = lowerLefts[i];
                 location = currentPiece.getLocation();
-                if(location.y < lowestY) {
+                if(location.y > lowestY) {
                     lowestY = location.y;
                     lowestLeft = currentPiece;
                 }
