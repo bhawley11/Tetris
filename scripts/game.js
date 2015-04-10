@@ -410,6 +410,8 @@ TETRIS.screens['game'] = (function() {
         }
 
         if(gameOver){
+            queuedSounds.length = 0;
+            addSound(TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt]);
             name = namePrompt();
             returnToMain(name);
         }
@@ -458,7 +460,6 @@ TETRIS.screens['game'] = (function() {
                             width: nextShapeSpec.width, height: nextShapeSpec.height
                         });
                     } else {
-                        addSound(TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt]);
                         gameOver = true;
                     }
                 }
