@@ -163,6 +163,10 @@ TETRIS.objects = function () {
         that.getLowerLeftPieceLocation = function() {
             var amtOfPieces = pieces.length,
                 currentPiece = null,
+                location = null,
+                lowerLefts = [],
+                lowestLeft,
+                lowestY = 0,
                 i = 0;
 
             for(i = 0; i < amtOfPieces; ++i) {
@@ -170,10 +174,22 @@ TETRIS.objects = function () {
 
                 if(currentPiece.getIsBottom()) {
                     if(currentPiece.getIsLeft()) {
-                        return currentPiece.getLocation();
+                        lowerLefts.push(currentPiece);
                     }
                 }
             }
+
+            lowestLeft = lowerLefts[0];
+            for(i = 0; i < lowerLefts.length; ++i) {
+                currentPiece = lowerLefts[i];
+                location = currentPiece.getLocation();
+                if(location.y > lowestY) {
+                    lowestY = location.y;
+                    lowestLeft = currentPiece;
+                }
+            }
+
+            return lowestLeft.getLocation();
         };
 
 
