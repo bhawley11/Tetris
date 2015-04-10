@@ -119,10 +119,6 @@ TETRIS.screens['game'] = (function() {
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
 
-        if(TETRIS.killGame) {
-            killGame();
-        }
-
         update();
         render();
 
@@ -651,6 +647,10 @@ TETRIS.screens['game'] = (function() {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
+
+        if(TETRIS.killGame) {
+            killGame();
+        }
 
         AIUpdate();
         render();
