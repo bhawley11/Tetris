@@ -20,14 +20,18 @@ TETRIS.input = (function(){
             key;
 
         function keyPress(e) {
-            if(TETRIS.onGameScreen){
-                for(var i = 0; i < that.handlers.length; i++){
-                    if(that.handlers[i].key === e.keyCode){
-                        that.handlers[i].lastFired = performance.now();
+            if(!TETRIS.AIRunning) {
+                if (TETRIS.onGameScreen) {
+                    for (var i = 0; i < that.handlers.length; i++) {
+                        if (that.handlers[i].key === e.keyCode) {
+                            that.handlers[i].lastFired = performance.now();
+                        }
                     }
                 }
+                that.keys[e.keyCode] = e.timeStamp;
+            } else {
+                TETRIS.killGame = true;
             }
-            that.keys[e.keyCode] = e.timeStamp;
         }
 
         function keyRelease(e) {

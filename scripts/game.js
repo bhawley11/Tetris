@@ -93,12 +93,7 @@ TETRIS.screens['game'] = (function() {
 
         pieceSetSound.volume = .25;
 
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
-            TETRIS.onGameScreen = false;
-            cancelNextRequest = true;
-            TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
-            TETRIS.main.showScreen('menu');
-        });
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, killGame);
 
         playScreen = TETRIS.graphics.GameBoard({
             pieceBackgroundImage : 'images/backgrounds/fud.jpg'
@@ -123,6 +118,10 @@ TETRIS.screens['game'] = (function() {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
+
+        if(TETRIS.killGame) {
+            killGame();
+        }
 
         update();
         render();
@@ -208,6 +207,15 @@ TETRIS.screens['game'] = (function() {
             }
         }
         return false;
+    }
+
+
+    function killGame() {
+        TETRIS.onGameScreen = false;
+        cancelNextRequest = true;
+        TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
+        TETRIS.killGame = false;
+        TETRIS.main.showScreen('menu');
     }
 
 
@@ -326,57 +334,61 @@ TETRIS.screens['game'] = (function() {
     function run() {
         var nextShapeSpec;
 
-        if(TETRIS.sessionID != null) {
-            cancelAnimationFrame(TETRIS.sessionID);
-            TETRIS.sessionID = null;
+        if(!TETRIS.AIRunning) {
+            if (TETRIS.sessionID != null) {
+                cancelAnimationFrame(TETRIS.sessionID);
+                TETRIS.sessionID = null;
+            }
+
+            multiplier = 1;
+            score = 0;
+            level = 1;
+            pointsForOneLine = 40;
+            pointsForTwoLines = 100;
+            pointsForThreeLines = 300;
+            pointsForFourLines = 1200;
+            speed = .75;
+            linesCleared = 0;
+            deletedIndexes.length = 0;
+            gameOver = false;
+            TETRIS.onGameScreen = true;
+            cancelNextRequest = false;
+
+            TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+            TETRIS.lastTime = performance.now();
+
+            TETRIS.keyboard.clearKeyboardState();
+
+            beginGameMusic();
+            updateNextPieceBackground(1);
+
+            for (var i = 0; i < 4; i++) {
+                shapeHistory.push('LZ');
+            }
+
+            serverCallHighScore();
+
+            gameBoard = TETRIS.objects.GameBoard();
+            gameBoard.createGameBoard();
+
+            currentShape = TETRIS.objects.Shape();
+            currentShape.createShape(nextShape());
+            currentShape.spawn(gameBoard);
+
+            abbrevForNextShape = nextShape();
+
+            nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+            shapeOnDeckImage = TETRIS.graphics.Texture({
+                image: nextShapeSpec.image,
+                center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                width: nextShapeSpec.width, height: nextShapeSpec.height
+            });
+
+            TETRIS.sessionID = requestAnimationFrame(gameLoop);
+        } else {
+            AIRun();
         }
-
-        multiplier = 1;
-        score = 0;
-        level = 1;
-        pointsForOneLine = 40;
-        pointsForTwoLines = 100;
-        pointsForThreeLines = 300;
-        pointsForFourLines = 1200;
-        speed = .75;
-        linesCleared = 0;
-        deletedIndexes.length = 0;
-        gameOver = false;
-        TETRIS.onGameScreen = true;
-        cancelNextRequest = false;
-
-        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
-
-        TETRIS.lastTime = performance.now();
-
-        TETRIS.keyboard.clearKeyboardState();
-
-        beginGameMusic();
-        updateNextPieceBackground(1);
-
-        for(var i = 0; i < 4; i++) {
-            shapeHistory.push('LZ');
-        }
-
-        serverCallHighScore();
-
-        gameBoard = TETRIS.objects.GameBoard();
-        gameBoard.createGameBoard();
-
-        currentShape =  TETRIS.objects.Shape();
-        currentShape.createShape(nextShape());
-        currentShape.spawn(gameBoard);
-
-        abbrevForNextShape = nextShape();
-
-        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
-        shapeOnDeckImage = TETRIS.graphics.Texture({
-            image : nextShapeSpec.image,
-            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
-            width : nextShapeSpec.width, height : nextShapeSpec.height
-        });
-
-        TETRIS.sessionID = requestAnimationFrame(gameLoop);
     }
 
 
@@ -576,6 +588,314 @@ TETRIS.screens['game'] = (function() {
         return false;
     }
 
+
+    /*********************** AI ***************************/
+
+    function AIRun() {
+        var nextShapeSpec;
+
+        if (TETRIS.sessionID != null) {
+            cancelAnimationFrame(TETRIS.sessionID);
+            TETRIS.sessionID = null;
+        }
+
+        multiplier = 1;
+        score = 0;
+        level = 1;
+        pointsForOneLine = 40;
+        pointsForTwoLines = 100;
+        pointsForThreeLines = 300;
+        pointsForFourLines = 1200;
+        speed = .5;
+        linesCleared = 0;
+        deletedIndexes.length = 0;
+        gameOver = false;
+        TETRIS.onGameScreen = true;
+        cancelNextRequest = false;
+
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+        TETRIS.lastTime = performance.now();
+
+        TETRIS.keyboard.clearKeyboardState();
+
+        beginGameMusic();
+        updateNextPieceBackground(1);
+
+        for (var i = 0; i < 4; i++) {
+            shapeHistory.push('LZ');
+        }
+
+        serverCallHighScore();
+
+        gameBoard = TETRIS.objects.GameBoard();
+        gameBoard.createGameBoard();
+
+        currentShape = TETRIS.objects.Shape();
+        currentShape.createShape(nextShape());
+        TETRIS.getDetailsOnce = true;
+        TETRIS.pieceActive = true;
+
+        abbrevForNextShape = nextShape();
+
+        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+        shapeOnDeckImage = TETRIS.graphics.Texture({
+            image: nextShapeSpec.image,
+            center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+            width: nextShapeSpec.width, height: nextShapeSpec.height
+        });
+
+        TETRIS.sessionID = requestAnimationFrame(AIGameLoop);
+    }
+
+
+    function AIGameLoop(time) {
+        TETRIS.elapsedTime = time - TETRIS.lastTime;
+        TETRIS.lastTime = time;
+        ticTime += TETRIS.elapsedTime;
+
+        AIUpdate();
+        render();
+
+        TETRIS.particleSystem.update(TETRIS.elapsedTime);
+        if (!cancelNextRequest) {
+            TETRIS.sessionID = requestAnimationFrame(AIGameLoop);
+        }
+    }
+
+
+    function AIUpdate() {
+        var moveMade = false,
+            nextShapeSpec = '';
+
+        if(TETRIS.getDetailsOnce) {
+            TETRIS.bestDetails = getBestLocation(gameBoard, currentShape);
+            currentShape.spawn(gameBoard);
+            TETRIS.getDetailsOnce = false;
+        }
+
+        if (!TETRIS.pieceActive) {
+
+            // Create new current shape
+            currentShape = TETRIS.objects.Shape();
+            currentShape.createShape(abbrevForNextShape);
+            TETRIS.pieceActive = true;
+            console.log(gameBoard.getShapes().length);
+
+            TETRIS.bestDetails = getBestLocation(gameBoard, currentShape);
+
+            if(currentShape.spawn(gameBoard)) {
+
+                // Next Shape
+                abbrevForNextShape = nextShape();
+                nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+
+                shapeOnDeckImage = TETRIS.graphics.Texture({
+                    image: nextShapeSpec.image,
+                    center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                    width: nextShapeSpec.width, height: nextShapeSpec.height
+                });
+            } else {
+                addSound(TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt]);
+                gameOver = true;
+            }
+        }
+
+
+        if (ticTime / 1000 > speed) {
+            if (!gameOver) {
+                if (currentShape.softDrop(gameBoard)) {
+                    if (!moveMade) {
+                        // Make moves here
+
+                        if (TETRIS.bestDetails.rotation !== currentShape.getCurrentRotationState()) {
+                            currentShape.rotate(gameBoard, 'r');
+                            moveMade = true;
+                        } else if(TETRIS.bestDetails.loc.x > currentShape.getLowerLeftPieceLocation().x) {
+                            moveRight();
+                            moveMade = true;
+                        } else if(TETRIS.bestDetails.loc.x < currentShape.getLowerLeftPieceLocation().x) {
+                            moveLeft();
+                            moveMade = true;
+                        } else {
+                            hardDrop();
+                            TETRIS.pieceActive = false;
+                        }
+
+                    }
+                } else {
+                    TETRIS.pieceActive = false;
+                }
+                moveMade = false;
+                ticTime = 0;
+            } else {
+                killGame();
+            }
+        }
+    }
+
+    function getBestLocation(gBoard, cShape) {
+        var best = -9999,
+            bestLocation = null,
+            bestRotation = 0,
+            canMoveLeft = true,
+            canMoveRight = true,
+            currentScore = 0,
+            didDrop = false,
+            i = 0,
+            rightsToMove = 0,
+            rightsMoved = 0,
+            lowerLeftPieceLocation = null,
+            rot = 0,
+            tempBoard,
+            tempShape;
+
+        for(rot; rot < 4; ++rot) {
+            rightsToMove = 0;
+            rightsMoved = 0;
+
+            while(rightsToMove < 11) {
+                tempShape = cShape.clone(cShape.getShapeAbbrev());               // Reset the shape and clone it to the current shape
+                tempBoard = gBoard.clone();
+
+                tempShape.spawn(tempBoard);
+
+                for (i; i < rot; ++i) {
+                    tempShape.rotate(gameBoard, 'r');
+                }
+                lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+
+                canMoveLeft = true;
+                canMoveRight = true;
+
+                while (canMoveLeft) {          // Move the shape left or right until it lines up with the last left it was at (we will want to increment it by one)
+                    canMoveLeft = tempShape.moveLeft(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                }
+
+                while (rightsMoved <= rightsToMove && canMoveRight) {
+                    rightsMoved++;
+                    canMoveRight = tempShape.moveRight(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                }
+
+                do {                                                    // Move shape down until it can't go anymore
+                    didDrop = tempShape.softDrop(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                } while (didDrop);
+
+                // Now the lower left piece is in the final place for this increment,
+                // now we need to score it.
+                currentScore = scoreGrid(tempBoard);
+
+                if (currentScore > best) {
+                    best = currentScore;
+                    bestLocation = tempShape.getLowerLeftPieceLocation();
+                    bestRotation = tempShape.getCurrentRotationState();
+                }
+                else {
+                    currentScore = 0;
+                }
+                rightsToMove++;
+                tempBoard.clearGrid();
+            }
+        }
+
+        return {
+            loc : {
+                x : bestLocation.x,
+                y : bestLocation.y
+            },
+            rotation : bestRotation
+        };
+    }
+
+
+    function scoreGrid(gBoard) {
+        var aggHeight,
+            bumpiness,
+            completeLines,
+            holes,
+            score,
+
+            heights,
+            a = -0.66569,
+            b = 0.99275,
+            c = -0.46544,
+            d = -0.24077;
+
+        heights = getHeightsOfGrid(gBoard);
+
+        aggHeight = getAggregateHeight(heights);
+        completeLines = gBoard.checkForCompleteLines().length;
+        holes = getHolesOfGrid(gBoard, heights);
+        bumpiness = getBumpinessOfGrid(heights);
+
+        score = a * aggHeight + b * completeLines + c * holes + d * bumpiness;
+        return score;
+    }
+
+    function getHeightsOfGrid(gBoard) {
+        var i = 0,
+            j = 0,
+            heights = [];
+
+        for(i; i < 10; ++i) {
+            for(j; j < 22; ++j) {
+                if(!gBoard.isEmpty({x : i, y : j})) {
+                    heights.push(22 - j);
+                } else if(j == 21) {
+                    heights.push(0);
+                }
+            }
+        }
+
+        return heights;
+    }
+
+
+    function getAggregateHeight(heights) {
+        var aggHeight = 0,
+            i = 0;
+
+        for(i; i < heights.length; ++i) {
+            aggHeight += heights[i];
+        }
+        return aggHeight;
+    }
+
+
+    function getHolesOfGrid(gBoard, heights) {
+        var amtOfHoles = 0,
+            top = 0,
+            i = 0,
+            j = 0;
+
+        for(i; i < heights.length; ++i) {
+            top = 22 - heights[i];
+
+            for(j = top; j < 22; ++j) {
+                if(gBoard.isEmpty({x : i, y : j})) {
+                    amtOfHoles++;
+                }
+            }
+        }
+
+        return amtOfHoles;
+    }
+
+
+    function getBumpinessOfGrid(heights) {
+        var i = 0,
+            bumpiness = 0,
+            length = heights.length;
+
+        for(i; i < length - 1; ++i) {
+            bumpiness += Math.abs(heights[i] - heights[i+1]);
+        }
+
+        return bumpiness;
+    }
     
     return {
         moveLeft : moveLeft,
@@ -585,6 +905,7 @@ TETRIS.screens['game'] = (function() {
         rotateLeft : rotateLeft,
         rotateRight : rotateRight,
         init : init,
+        killGame : killGame,
         run : run
     };
 }());

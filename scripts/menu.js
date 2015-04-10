@@ -7,6 +7,7 @@ TETRIS.screens['menu'] = (function() {
 
     function init() {
         document.getElementById('menu-button-newGame').addEventListener('click', function () {
+            TETRIS.AIRunning = true;
             TETRIS.main.showScreen('game');
         }, false);
 
