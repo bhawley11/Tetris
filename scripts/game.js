@@ -718,6 +718,7 @@ TETRIS.screens['game'] = (function() {
                             moveMade = true;
                         } else {
                             hardDrop();
+                            addSound(pieceSetSound);
                             TETRIS.pieceActive = false;
                         }
 
