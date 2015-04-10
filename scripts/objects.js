@@ -195,7 +195,7 @@ TETRIS.objects = function () {
 
 
         that.setShapeAbbrev = function(s) {
-          shape = s;
+            shape = s;
         };
 
 
@@ -905,9 +905,9 @@ TETRIS.objects = function () {
 
 
         that.cloneGrid = function() {
-          var i = 0,
-              j = 0,
-              clonedGrid = [[]];
+            var i = 0,
+                j = 0,
+                clonedGrid = [[]];
 
             for(i = 0; i < 10; ++i) {
                 clonedGrid[i] = [];
@@ -1040,14 +1040,14 @@ TETRIS.objects = function () {
 
 
         that.setGrid = function(newGrid) {
-          var i = 0,
-              j = 0;
+            var i = 0,
+                j = 0;
 
-          for(i = 0; i < 10; ++i) {
-              for(j; j < 22; ++j) {
-                  grid[i][j] = newGrid[i][j];
-              }
-          }
+            for(i = 0; i < 10; ++i) {
+                for(j; j < 22; ++j) {
+                    grid[i][j] = newGrid[i][j];
+                }
+            }
         };
 
 
