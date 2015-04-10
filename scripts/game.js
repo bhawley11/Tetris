@@ -317,8 +317,6 @@ TETRIS.screens['game'] = (function() {
 
 
     function returnToMain(name) {
-        name = prompt("Please enter your name", "Chief");
-
         if(name === '' || name === null){
             name = 'Unknown';
         }
