@@ -9,13 +9,10 @@ TETRIS.screens['game'] = (function() {
         gameOver = false,
         gainedTheLead = false,
         firstStrike = false,
-        deletedSomething = false,
 
         currentShape = null,
         shapeOnDeckImage = null,
         gameBoard = null,
-        voice = null,
-        gunNoise = TETRIS.sounds['sounds/guns/assault_rifle_burst_1.' + TETRIS.audioExt],
 
         playScreen = null,
         scoreBoard = null,
@@ -38,7 +35,43 @@ TETRIS.screens['game'] = (function() {
         linesCleared,
         linesToNextDiff = 0,
         deletedIndexes = [],
-        numDeletedForVoice = 0;
+
+        firstStrikeSound = TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt],
+        gainedTheLeadSound = TETRIS.sounds['sounds/voice/gained_the_lead.' + TETRIS.audioExt],
+        pieceSetSound = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt],
+        rowCollapseSound = TETRIS.sounds['sounds/guns/assault_rifle_burst_1.' + TETRIS.audioExt],
+        killStreakSound = null,
+        queuedSounds = [];
+
+
+    function addSound (sound) {
+        var index;
+
+        if(queuedSounds.length > 0) {
+            if(!queuedSounds[0].paused) {       // Top element is currently playing
+                queuedSounds.push(sound);
+                return;
+            }
+        }
+
+        queuedSounds.push(sound);
+        index = queuedSounds.indexOf(sound);
+        queuedSounds[index].addEventListener('ended', audioEnded);
+        queuedSounds[index].play();
+    }
+
+
+    function audioEnded() {
+        var currentSound = null;
+
+        queuedSounds.shift();
+
+        if(queuedSounds.length > 0) {
+            currentSound = queuedSounds[0];
+            currentSound.addEventListener('ended', audioEnded);
+            currentSound.play();
+        }
+    }
 
 
     function beginGameMusic() {
@@ -58,12 +91,9 @@ TETRIS.screens['game'] = (function() {
     function init() {
         console.log('Tetris initializing...');
 
-        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, function() {
-            TETRIS.onGameScreen = false;
-            cancelNextRequest = true;
-            TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
-            TETRIS.main.showScreen('menu');
-        });
+        pieceSetSound.volume = .25;
+
+        TETRIS.keyboard.registerCommand(KeyEvent.DOM_VK_ESCAPE, killGame);
 
         playScreen = TETRIS.graphics.GameBoard({
             pieceBackgroundImage : 'images/backgrounds/fud.jpg'
@@ -88,6 +118,10 @@ TETRIS.screens['game'] = (function() {
         TETRIS.elapsedTime = time - TETRIS.lastTime;
         TETRIS.lastTime = time;
         ticTime += TETRIS.elapsedTime;
+
+        if(TETRIS.killGame) {
+            killGame();
+        }
 
         update();
         render();
@@ -147,6 +181,24 @@ TETRIS.screens['game'] = (function() {
     }
 
 
+    function handleSounds(linesDeletedThisUpdate) {
+        if(linesDeletedThisUpdate === 0) {
+            addSound(pieceSetSound);
+        } else {
+            addSound(rowCollapseSound);
+
+            if(linesDeletedThisUpdate > 1) {
+                addSound(getRowDeleteVoiceEffect(linesDeletedThisUpdate));
+            }
+
+            if(!firstStrike) {
+                addSound(firstStrikeSound);
+                firstStrike = true;
+            }
+        }
+    }
+
+
     function inHistory(shape){
         var i = 0;
         for(i; i < shapeHistory.length; i++){
@@ -155,6 +207,15 @@ TETRIS.screens['game'] = (function() {
             }
         }
         return false;
+    }
+
+
+    function killGame() {
+        TETRIS.onGameScreen = false;
+        cancelNextRequest = true;
+        TETRIS.sounds['sounds/music/ascendancy_remix.' + TETRIS.audioExt].pause();
+        TETRIS.killGame = false;
+        TETRIS.main.showScreen('menu');
     }
 
 
@@ -179,6 +240,7 @@ TETRIS.screens['game'] = (function() {
             speed = .10;
         }
         linesToNextDiff = 0;
+        updateNextPieceBackground(level);
     }
 
 
@@ -202,43 +264,41 @@ TETRIS.screens['game'] = (function() {
     }
 
 
-    function playRowDeleteVoiceEffect(numDeleted) {
-        voice = null;
+    function getRowDeleteVoiceEffect(numDeleted) {
+        killStreakSound = null;
 
         switch(numDeleted) {
             case 2:
-                voice = TETRIS.sounds['sounds/voice/double_kill.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/double_kill.' + TETRIS.audioExt];
                 break;
             case 3:
-                voice = TETRIS.sounds['sounds/voice/triple_kill.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/triple_kill.' + TETRIS.audioExt];
                 break;
             case 4:
-                voice = TETRIS.sounds['sounds/voice/overkill.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/overkill.' + TETRIS.audioExt];
                 break;
             case 5:
-                voice = TETRIS.sounds['sounds/voice/killtacular.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killtacular.' + TETRIS.audioExt];
                 break;
             case 6:
-                voice = TETRIS.sounds['sounds/voice/killtrocity.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killtrocity.' + TETRIS.audioExt];
                 break;
             case 7:
-                voice = TETRIS.sounds['sounds/voice/killimanjaro.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killimanjaro.' + TETRIS.audioExt];
                 break;
             case 8:
-                voice = TETRIS.sounds['sounds/voice/killtastrophe.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killtastrophe.' + TETRIS.audioExt];
                 break;
             case 9:
-                voice = TETRIS.sounds['sounds/voice/killpocalypse.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killpocalypse.' + TETRIS.audioExt];
                 break;
             case 10:
-                voice = TETRIS.sounds['sounds/voice/killionaire.' + TETRIS.audioExt];
+                killStreakSound = TETRIS.sounds['sounds/voice/killionaire.' + TETRIS.audioExt];
                 break;
         }
 
-        if(voice !== null) {
-            voice.currentTime = 0;
-            voice.play();
-        }
+        killStreakSound.currentTime = 0;
+        return killStreakSound;
     }
 
 
@@ -274,56 +334,61 @@ TETRIS.screens['game'] = (function() {
     function run() {
         var nextShapeSpec;
 
-        if(TETRIS.sessionID != null) {
-            cancelAnimationFrame(TETRIS.sessionID);
-            TETRIS.sessionID = null;
+        if(!TETRIS.AIRunning) {
+            if (TETRIS.sessionID != null) {
+                cancelAnimationFrame(TETRIS.sessionID);
+                TETRIS.sessionID = null;
+            }
+
+            multiplier = 1;
+            score = 0;
+            level = 1;
+            pointsForOneLine = 40;
+            pointsForTwoLines = 100;
+            pointsForThreeLines = 300;
+            pointsForFourLines = 1200;
+            speed = .75;
+            linesCleared = 0;
+            deletedIndexes.length = 0;
+            gameOver = false;
+            TETRIS.onGameScreen = true;
+            cancelNextRequest = false;
+
+            TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+            TETRIS.lastTime = performance.now();
+
+            TETRIS.keyboard.clearKeyboardState();
+
+            beginGameMusic();
+            updateNextPieceBackground(1);
+
+            for (var i = 0; i < 4; i++) {
+                shapeHistory.push('LZ');
+            }
+
+            serverCallHighScore();
+
+            gameBoard = TETRIS.objects.GameBoard();
+            gameBoard.createGameBoard();
+
+            currentShape = TETRIS.objects.Shape();
+            currentShape.createShape(nextShape());
+            currentShape.spawn(gameBoard);
+
+            abbrevForNextShape = nextShape();
+
+            nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+            shapeOnDeckImage = TETRIS.graphics.Texture({
+                image: nextShapeSpec.image,
+                center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                width: nextShapeSpec.width, height: nextShapeSpec.height
+            });
+
+            TETRIS.sessionID = requestAnimationFrame(gameLoop);
+        } else {
+            AIRun();
         }
-
-        multiplier = 1;
-        score = 0;
-        level = 1;
-        pointsForOneLine = 40;
-        pointsForTwoLines = 100;
-        pointsForThreeLines = 300;
-        pointsForFourLines = 1200;
-        speed = .75;
-        linesCleared = 0;
-        deletedIndexes.length = 0;
-        gameOver = false;
-        TETRIS.onGameScreen = true;
-        cancelNextRequest = false;
-
-        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
-
-        TETRIS.lastTime = performance.now();
-
-        TETRIS.keyboard.clearKeyboardState();
-
-        beginGameMusic();
-
-        for(var i = 0; i < 4; i++) {
-            shapeHistory.push('LZ');
-        }
-
-        serverCallHighScore();
-
-        gameBoard = TETRIS.objects.GameBoard();
-        gameBoard.createGameBoard();
-
-        currentShape =  TETRIS.objects.Shape();
-        currentShape.createShape(nextShape());
-        currentShape.spawn(gameBoard);
-
-        abbrevForNextShape = nextShape();
-
-        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
-        shapeOnDeckImage = TETRIS.graphics.Texture({
-            image : nextShapeSpec.image,
-            center : { x : nextShapeSpec.center.x, y : nextShapeSpec.center.y },
-            width : nextShapeSpec.width, height : nextShapeSpec.height
-        });
-
-        TETRIS.sessionID = requestAnimationFrame(gameLoop);
     }
 
 
@@ -343,13 +408,12 @@ TETRIS.screens['game'] = (function() {
     function update() {
         var linesDeletedThisUpdate = 0,
             nextShapeSpec,
-            name = '',
-            soundEffect = TETRIS.sounds['sounds/effects/boltshot_shot.' + TETRIS.audioExt],
-            firstStrikeVoice = TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt],
-            ticBeforeAnimation = 0;
+            name = '';
 
-        soundEffect.volume = .25;
-        voice = TETRIS.sounds['sounds/voice/first_strike.' + TETRIS.audioExt];
+        if(!gainedTheLead && score > topScore) {
+            addSound(gainedTheLeadSound);
+            gainedTheLead = true;
+        }
 
         if(gameOver){
             name = namePrompt();
@@ -359,8 +423,6 @@ TETRIS.screens['game'] = (function() {
             if(ticTime/1000 > speed) {
                 if (!currentShape.softDrop(gameBoard)) {
                     deletedIndexes = 0;
-
-                    ticBeforeAnimation = ticTime;
 
                    do {
                        deletedIndexes = gameBoard.checkForCompleteLines();
@@ -377,20 +439,15 @@ TETRIS.screens['game'] = (function() {
 
                     } while(deletedIndexes.length > 0);
 
-                    ticTime = ticBeforeAnimation;
+                    // PLAY SOUND
+                    handleSounds(linesDeletedThisUpdate);
 
-                    if(linesDeletedThisUpdate === 0) {
-                        soundEffect.play();
-                    } else {
-                        numDeletedForVoice = linesDeletedThisUpdate;
-                        deletedSomething = true;
-                        gunNoise.play();
-                    }
-
+                    // ADVANCE TO NEXT LEVEL
                     if(linesToNextDiff >= 10){
                         nextLevel();
                     }
 
+                    // NEXT SHAPE
                     currentShape = TETRIS.objects.Shape();
                     currentShape.createShape(abbrevForNextShape);
 
@@ -407,46 +464,12 @@ TETRIS.screens['game'] = (function() {
                             width: nextShapeSpec.width, height: nextShapeSpec.height
                         });
                     } else {
-                        TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt].play();
+                        addSound(TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt]);
                         gameOver = true;
                     }
                 }
+
                 score++;
-
-                firstStrikeVoice.addEventListener('ended', function() {
-                   if(!gainedTheLead && score > topScore) {
-                       gainedTheLead = true;
-                       TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                   }
-                });
-
-                voice.addEventListener('ended', function () {
-                    if(!firstStrike) {
-                        firstStrike = true;
-                        firstStrikeVoice.play();
-                    }
-                    else if(!gainedTheLead && score > topScore) {
-                        gainedTheLead = true;
-                        TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                    }
-                });
-
-                gunNoise.addEventListener('ended', function () {
-                    if(deletedSomething) {
-                        playRowDeleteVoiceEffect(numDeletedForVoice);
-                        deletedSomething = false;
-                        numDeletedForVoice = 0;
-                    } else {
-                        if(!firstStrike) {
-                            firstStrike = true;
-                            firstStrikeVoice.play();
-                        }
-                        else if(!gainedTheLead && score > topScore) {
-                            gainedTheLead = true;
-                            TETRIS.sounds['sounds/voice/gain_the_lead.' + TETRIS.audioExt].play();
-                        }
-                    }
-                });
 
                 deletedIndexes.length = 0;
                 ticTime = 0;
@@ -455,6 +478,36 @@ TETRIS.screens['game'] = (function() {
         }
         updateScoreBoard();
     }
+
+
+    function updateNextPieceBackground(level) {
+        switch(level) {
+            case 1:
+                playScreen.changePieceBackground('images/backgrounds/fud.jpg');
+                break;
+            case 2:
+                playScreen.changePieceBackground('images/backgrounds/requiem.png');
+                break;
+            case 3:
+                playScreen.changePieceBackground('images/backgrounds/infinity.png');
+                break;
+            case 4:
+                playScreen.changePieceBackground('images/backgrounds/reclaimer.png');
+                break;
+            case 5:
+                playScreen.changePieceBackground('images/backgrounds/shutdown.png');
+                break;
+            case 6:
+                playScreen.changePieceBackground('images/backgrounds/composer.png');
+                break;
+            case 7:
+                playScreen.changePieceBackground('images/backgrounds/midnight.png');
+                break;
+            case 8:
+                break;
+        }
+    }
+
 
     function updateScore(amountOfRows) {
         if(amountOfRows != 0){
@@ -473,6 +526,7 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
     function updateScoreBoard(){
         scoreBoard.setLevel(level);
         scoreBoard.setScore(score);
@@ -489,6 +543,7 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
     function rotateRight(){
         var soundEffect = TETRIS.sounds['sounds/effects/magnum_scope_in.' + TETRIS.audioExt];
         if(currentShape.rotate(gameBoard, 'r')){
@@ -496,6 +551,7 @@ TETRIS.screens['game'] = (function() {
             soundEffect.play();
         }
     }
+
 
     function moveLeft(){
         var soundEffect = TETRIS.sounds['sounds/effects/br_scope_out.' + TETRIS.audioExt];
@@ -505,6 +561,7 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
     function moveRight(){
         var soundEffect = TETRIS.sounds['sounds/effects/br_scope_in.' + TETRIS.audioExt];
         if(currentShape.moveRight(gameBoard)) {
@@ -513,10 +570,12 @@ TETRIS.screens['game'] = (function() {
         }
     }
 
+
     function hardDrop(){
         score += currentShape.hardDrop(gameBoard);
         ticTime = speed * 1000 + 1;
     }
+
 
     function softDrop(){
         var soundEffect = TETRIS.sounds['sounds/effects/button_noise.' + TETRIS.audioExt];
@@ -529,6 +588,315 @@ TETRIS.screens['game'] = (function() {
         return false;
     }
 
+
+    /*********************** AI ***************************/
+
+    function AIRun() {
+        var nextShapeSpec;
+
+        if (TETRIS.sessionID != null) {
+            cancelAnimationFrame(TETRIS.sessionID);
+            TETRIS.sessionID = null;
+        }
+
+        multiplier = 1;
+        score = 0;
+        level = 1;
+        pointsForOneLine = 40;
+        pointsForTwoLines = 100;
+        pointsForThreeLines = 300;
+        pointsForFourLines = 1200;
+        speed = .5;
+        linesCleared = 0;
+        deletedIndexes.length = 0;
+        gameOver = false;
+        TETRIS.onGameScreen = true;
+        cancelNextRequest = false;
+
+        TETRIS.sounds['sounds/music/unsullied_memory.' + TETRIS.audioExt].pause();
+
+        TETRIS.lastTime = performance.now();
+
+        TETRIS.keyboard.clearKeyboardState();
+
+        beginGameMusic();
+        updateNextPieceBackground(1);
+
+        for (var i = 0; i < 4; i++) {
+            shapeHistory.push('LZ');
+        }
+
+        serverCallHighScore();
+
+        gameBoard = TETRIS.objects.GameBoard();
+        gameBoard.createGameBoard();
+
+        currentShape = TETRIS.objects.Shape();
+        currentShape.createShape(nextShape());
+        TETRIS.getDetailsOnce = true;
+        TETRIS.pieceActive = true;
+
+        abbrevForNextShape = nextShape();
+
+        nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+        shapeOnDeckImage = TETRIS.graphics.Texture({
+            image: nextShapeSpec.image,
+            center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+            width: nextShapeSpec.width, height: nextShapeSpec.height
+        });
+
+        TETRIS.sessionID = requestAnimationFrame(AIGameLoop);
+    }
+
+
+    function AIGameLoop(time) {
+        TETRIS.elapsedTime = time - TETRIS.lastTime;
+        TETRIS.lastTime = time;
+        ticTime += TETRIS.elapsedTime;
+
+        AIUpdate();
+        render();
+
+        TETRIS.particleSystem.update(TETRIS.elapsedTime);
+        if (!cancelNextRequest) {
+            TETRIS.sessionID = requestAnimationFrame(AIGameLoop);
+        }
+    }
+
+
+    function AIUpdate() {
+        var moveMade = false,
+            nextShapeSpec = '';
+
+        if(TETRIS.getDetailsOnce) {
+            TETRIS.bestDetails = getBestLocation(gameBoard, currentShape);
+            currentShape.spawn(gameBoard);
+            TETRIS.getDetailsOnce = false;
+        }
+
+        if (!TETRIS.pieceActive) {
+
+            // Create new current shape
+            currentShape = TETRIS.objects.Shape();
+            currentShape.createShape(abbrevForNextShape);
+            TETRIS.pieceActive = true;
+            console.log(gameBoard.getShapes().length);
+
+            TETRIS.bestDetails = getBestLocation(gameBoard, currentShape);
+
+            if(currentShape.spawn(gameBoard)) {
+
+                // Next Shape
+                abbrevForNextShape = nextShape();
+                nextShapeSpec = getNextShapeDetails(abbrevForNextShape);
+
+                shapeOnDeckImage = TETRIS.graphics.Texture({
+                    image: nextShapeSpec.image,
+                    center: {x: nextShapeSpec.center.x, y: nextShapeSpec.center.y},
+                    width: nextShapeSpec.width, height: nextShapeSpec.height
+                });
+            } else {
+                addSound(TETRIS.sounds['sounds/voice/game_over.' + TETRIS.audioExt]);
+                gameOver = true;
+            }
+        }
+
+
+        if (ticTime / 1000 > speed) {
+            if (!gameOver) {
+                if (currentShape.softDrop(gameBoard)) {
+                    if (!moveMade) {
+                        // Make moves here
+
+                        if (TETRIS.bestDetails.rotation !== currentShape.getCurrentRotationState()) {
+                            currentShape.rotate(gameBoard, 'r');
+                            moveMade = true;
+                        } else if(TETRIS.bestDetails.loc.x > currentShape.getLowerLeftPieceLocation().x) {
+                            moveRight();
+                            moveMade = true;
+                        } else if(TETRIS.bestDetails.loc.x < currentShape.getLowerLeftPieceLocation().x) {
+                            moveLeft();
+                            moveMade = true;
+                        } else {
+                            hardDrop();
+                            TETRIS.pieceActive = false;
+                        }
+
+                    }
+                } else {
+                    TETRIS.pieceActive = false;
+                }
+                moveMade = false;
+                ticTime = 0;
+            } else {
+                killGame();
+            }
+        }
+    }
+
+    function getBestLocation(gBoard, cShape) {
+        var best = -9999,
+            bestLocation = null,
+            bestRotation = 0,
+            canMoveLeft = true,
+            canMoveRight = true,
+            currentScore = 0,
+            didDrop = false,
+            i = 0,
+            rightsToMove = 0,
+            rightsMoved = 0,
+            lowerLeftPieceLocation = null,
+            rot = 0,
+            tempBoard,
+            tempShape;
+
+        for(rot; rot < 4; ++rot) {
+            rightsToMove = 0;
+            rightsMoved = 0;
+
+            while(rightsToMove < 11) {
+                tempShape = cShape.clone(cShape.getShapeAbbrev());               // Reset the shape and clone it to the current shape
+                tempBoard = gBoard.clone();
+
+                tempShape.spawn(tempBoard);
+
+                for (i; i < rot; ++i) {
+                    tempShape.rotate(gameBoard, 'r');
+                }
+                lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+
+                canMoveLeft = true;
+                canMoveRight = true;
+
+                while (canMoveLeft) {          // Move the shape left or right until it lines up with the last left it was at (we will want to increment it by one)
+                    canMoveLeft = tempShape.moveLeft(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                }
+
+                while (rightsMoved <= rightsToMove && canMoveRight) {
+                    rightsMoved++;
+                    canMoveRight = tempShape.moveRight(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                }
+
+                do {                                                    // Move shape down until it can't go anymore
+                    didDrop = tempShape.softDrop(tempBoard);
+                    lowerLeftPieceLocation = tempShape.getLowerLeftPieceLocation();
+                } while (didDrop);
+
+                // Now the lower left piece is in the final place for this increment,
+                // now we need to score it.
+                currentScore = scoreGrid(tempBoard);
+
+                if (currentScore > best) {
+                    best = currentScore;
+                    bestLocation = tempShape.getLowerLeftPieceLocation();
+                    bestRotation = tempShape.getCurrentRotationState();
+                }
+                else {
+                    currentScore = 0;
+                }
+                rightsToMove++;
+                tempBoard.clearGrid();
+            }
+        }
+
+        return {
+            loc : {
+                x : bestLocation.x,
+                y : bestLocation.y
+            },
+            rotation : bestRotation
+        };
+    }
+
+
+    function scoreGrid(gBoard) {
+        var aggHeight,
+            bumpiness,
+            completeLines,
+            holes,
+            score,
+
+            heights,
+            a = -0.66569,
+            b = 0.99275,
+            c = -0.46544,
+            d = -0.24077;
+
+        heights = getHeightsOfGrid(gBoard);
+
+        aggHeight = getAggregateHeight(heights);
+        completeLines = gBoard.checkForCompleteLines().length;
+        holes = getHolesOfGrid(gBoard, heights);
+        bumpiness = getBumpinessOfGrid(heights);
+
+        score = a * aggHeight + b * completeLines + c * holes + d * bumpiness;
+        return score;
+    }
+
+    function getHeightsOfGrid(gBoard) {
+        var i = 0,
+            j = 0,
+            heights = [];
+
+        for(i; i < 10; ++i) {
+            for(j; j < 22; ++j) {
+                if(!gBoard.isEmpty({x : i, y : j})) {
+                    heights.push(22 - j);
+                } else if(j == 21) {
+                    heights.push(0);
+                }
+            }
+        }
+
+        return heights;
+    }
+
+
+    function getAggregateHeight(heights) {
+        var aggHeight = 0,
+            i = 0;
+
+        for(i; i < heights.length; ++i) {
+            aggHeight += heights[i];
+        }
+        return aggHeight;
+    }
+
+
+    function getHolesOfGrid(gBoard, heights) {
+        var amtOfHoles = 0,
+            top = 0,
+            i = 0,
+            j = 0;
+
+        for(i; i < heights.length; ++i) {
+            top = 22 - heights[i];
+
+            for(j = top; j < 22; ++j) {
+                if(gBoard.isEmpty({x : i, y : j})) {
+                    amtOfHoles++;
+                }
+            }
+        }
+
+        return amtOfHoles;
+    }
+
+
+    function getBumpinessOfGrid(heights) {
+        var i = 0,
+            bumpiness = 0,
+            length = heights.length;
+
+        for(i; i < length - 1; ++i) {
+            bumpiness += Math.abs(heights[i] - heights[i+1]);
+        }
+
+        return bumpiness;
+    }
+    
     return {
         moveLeft : moveLeft,
         moveRight : moveRight,
@@ -537,6 +905,7 @@ TETRIS.screens['game'] = (function() {
         rotateLeft : rotateLeft,
         rotateRight : rotateRight,
         init : init,
+        killGame : killGame,
         run : run
     };
 }());

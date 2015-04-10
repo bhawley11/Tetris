@@ -28,6 +28,15 @@ TETRIS.objects = function () {
         };
 
 
+        that.clone = function(s){
+            var cloneShape = TETRIS.objects.Shape();
+
+            cloneShape.createShape(s);
+
+            return cloneShape;
+        };
+
+
         that.containsPiece = function (piece) {
             var found = false,
                 loc = null,
@@ -151,13 +160,57 @@ TETRIS.objects = function () {
         };
 
 
+        that.getCurrentRotationState = function () {
+            return currentRotationState;
+        };
+
+
+        that.setCurrentRotationState = function(crs) {
+            currentRotationState = crs;
+        };
+
+
         that.getPieces = function () {
             return (pieces.length > 0) ? pieces : null;
         };
 
 
+        that.getLowerLeftPieceLocation = function() {
+            var amtOfPieces = pieces.length,
+                currentPiece = null,
+                i = 0;
+
+            for(i = 0; i < amtOfPieces; ++i) {
+                currentPiece = pieces[i];
+
+                if(currentPiece.getIsBottom()) {
+                    if(currentPiece.getIsLeft()) {
+                        return currentPiece.getLocation();
+                    }
+                }
+            }
+        };
+
+
+        that.setPieces = function (pList) {
+            var amtOfPieces = pList.length,
+                currentPiece = null,
+                i = 0;
+
+            for(i = 0; i < amtOfPieces; ++i) {
+                currentPiece = pList[i];
+                pieces.push(currentPiece);
+            }
+        };
+
+
         that.getShapeAbbrev = function() {
             return shape;
+        };
+
+
+        that.setShapeAbbrev = function(s) {
+          shape = s;
         };
 
 
@@ -168,6 +221,11 @@ TETRIS.objects = function () {
         that.getRotationState = function(){
             return currentRotationState;
         };
+
+        that.setSpawned = function(s) {
+            spawned = s;
+        };
+
 
         that.hardDrop = function (gameBoard) {
             var able = true,
@@ -940,14 +998,36 @@ TETRIS.objects = function () {
             }
         };
 
+        that.clone = function() {
+            var clone = new TETRIS.objects.GameBoard(),
+                tempGrid;
+
+            clone.createGameBoard();
+            tempGrid = that.cloneGrid();
+            clone.setGrid(tempGrid);
+            clone.setShapes(currentShapes);
+
+            return clone;
+        };
+
+
         that.cloneGrid = function() {
           var i = 0,
               j = 0,
               clonedGrid = [[]];
+
+            for(i = 0; i < 10; ++i) {
+                clonedGrid[i] = [];
+            }
+
             for (i = 0; i < 10; ++i) {
-                if (!clonedGrid[i]) clonedGrid[i] = [];
+                if (!grid[i]) grid[i] = [];
                 for (j = 0; j < 22; ++j) {
-                    clonedGrid[i][j] = grid[i][j];
+                    if(grid[i][j] !== null) {
+                        clonedGrid[i].push(grid[i][j]);
+                    } else {
+                        clonedGrid[i][j] = null;
+                    }
                 }
             }
 
@@ -1010,7 +1090,7 @@ TETRIS.objects = function () {
 
                 containsShape = function(list, sh) {
                     var i = 0;
-                    for(i = 0; i < list.length; ++i) {
+                    for(i=0; i < list.length; ++i) {
                         if(list[i] === sh) {
                             return true;
                         }
@@ -1018,7 +1098,7 @@ TETRIS.objects = function () {
                     return false;
                 };
 
-            for(index = 0; index < amtOfIndexes; ++index) {
+            for(index; index < amtOfIndexes; ++index) {
                 row = listOfIndexes[index];
 
                 for(i = 0; i < 10; ++i) {
@@ -1074,12 +1154,39 @@ TETRIS.objects = function () {
         };
 
 
+        that.getShapes = function() {
+            return currentShapes;
+        };
+
+
+        that.setShapes = function(sl) {
+            var amtOfShapes = sl.length,
+                i = 0;
+
+            for(i = 0; i < amtOfShapes; ++i) {
+                currentShapes.push(sl[i]);
+            }
+        };
+
+
         that.getGrid = function () {
             return grid;
         };
 
         that.getShapes = function() {
             return currentShapes;
+        };
+
+
+        that.setGrid = function(newGrid) {
+          var i = 0,
+              j = 0;
+
+          for(i = 0; i < 10; ++i) {
+              for(j; j < 22; ++j) {
+                  grid[i][j] = newGrid[i][j];
+              }
+          }
         };
 
 
@@ -1142,7 +1249,6 @@ TETRIS.objects = function () {
                 j = 0,
                 locX = 0,
                 locY = 0,
-                oldLoc = null,
                 pieces = sh.getPieces();
 
             for(i = 0; i < amtOfPieces; ++i) {
