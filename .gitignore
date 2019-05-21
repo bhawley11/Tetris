@@ -6,3 +6,4 @@ images/warthog/Thumbs.db
 images/shapes/Thumbs.db
 images/squares/Thumbs.db
 score.txt
+node_modules/*
