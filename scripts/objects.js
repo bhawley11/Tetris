@@ -1057,7 +1057,7 @@ TETRIS.objects = function () {
                 j = 0;
 
             for(i = 0; i < 10; ++i) {
-                for(j; j < 22; ++j) {
+                for(j = 0; j < 22; ++j) {
                     grid[i][j] = newGrid[i][j];
                 }
             }
